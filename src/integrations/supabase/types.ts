@@ -43,6 +43,7 @@ export type Database = {
           answers: Json | null
           career_path: string
           created_at: string
+          duration_seconds: number | null
           feedback: string | null
           id: string
           recommended_paths: string[] | null
@@ -55,6 +56,7 @@ export type Database = {
           answers?: Json | null
           career_path: string
           created_at?: string
+          duration_seconds?: number | null
           feedback?: string | null
           id?: string
           recommended_paths?: string[] | null
@@ -67,6 +69,7 @@ export type Database = {
           answers?: Json | null
           career_path?: string
           created_at?: string
+          duration_seconds?: number | null
           feedback?: string | null
           id?: string
           recommended_paths?: string[] | null

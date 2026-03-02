@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Globe, LogOut } from "lucide-react";
+import { Globe, LogOut, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header: React.FC = () => {
@@ -44,6 +44,10 @@ const Header: React.FC = () => {
           </button>
           {user ? (
             <>
+              <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/my-results")}>
+                <BarChart3 className="w-4 h-4 me-1" />
+                {locale === "ar" ? "نتائجي" : "My Results"}
+              </Button>
               <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/dashboard")}>
                 {locale === "ar" ? "لوحة التحكم" : "Dashboard"}
               </Button>
