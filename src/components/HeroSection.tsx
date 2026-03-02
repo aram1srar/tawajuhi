@@ -56,7 +56,7 @@ const HeroSection: React.FC = () => {
             <Button
               size="lg"
               className="rounded-full px-8 text-base gradient-gold text-accent-foreground hover:opacity-90 border-0"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/dashboard")}
             >
               {t.hero.cta}
             </Button>

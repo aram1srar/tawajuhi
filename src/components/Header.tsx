@@ -35,30 +35,36 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-all"
-          >
-            <Globe className="w-4 h-4" />
-            {locale === "ar" ? "EN" : "عربي"}
-          </button>
           {user ? (
             <>
               <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/my-results")}>
                 <BarChart3 className="w-4 h-4 me-1" />
                 {locale === "ar" ? "نتائجي" : "My Results"}
               </Button>
-              <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/dashboard")}>
-                {locale === "ar" ? "لوحة التحكم" : "Dashboard"}
-              </Button>
-              <Button size="sm" variant="ghost" className="rounded-full" onClick={() => signOut()}>
+              <button
+                onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-all"
+              >
+                <Globe className="w-4 h-4" />
+                {locale === "ar" ? "EN" : "عربي"}
+              </button>
+              <Button size="sm" variant="ghost" className="rounded-full" onClick={() => signOut()} title={locale === "ar" ? "تسجيل الخروج" : "Log out"}>
                 <LogOut className="w-4 h-4" />
               </Button>
             </>
           ) : (
-            <Button size="sm" className="rounded-full" onClick={() => navigate("/auth")}>
-              {t.nav.start}
-            </Button>
+            <>
+              <button
+                onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-all"
+              >
+                <Globe className="w-4 h-4" />
+                {locale === "ar" ? "EN" : "عربي"}
+              </button>
+              <Button size="sm" className="rounded-full" onClick={() => navigate("/auth")}>
+                {t.nav.start}
+              </Button>
+            </>
           )}
         </div>
       </div>
