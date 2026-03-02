@@ -10,6 +10,7 @@ import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import TestPage from "./pages/TestPage";
 import ResultsPage from "./pages/ResultsPage";
+import MyResultsPage from "./pages/MyResultsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/test/:path" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
               <Route path="/results/:path" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
+              <Route path="/my-results" element={<ProtectedRoute><MyResultsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -24,6 +24,7 @@ const TestPage: React.FC = () => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [finished, setFinished] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [startTime] = useState(() => Date.now());
 
   const current = pathQuestions[currentIndex];
   const progress = ((currentIndex + (showExplanation ? 1 : 0)) / pathQuestions.length) * 100;
@@ -64,6 +65,8 @@ const TestPage: React.FC = () => {
       const simScore = simTotal > 0 ? Math.round((simCorrect / simTotal) * 100) : 0;
       const totalScore = Math.round(((theoryCorrect + simCorrect) / pathQuestions.length) * 100);
 
+      const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+
       if (user) {
         setSaving(true);
         await supabase.from("test_results").insert({
@@ -74,6 +77,7 @@ const TestPage: React.FC = () => {
           total_score: totalScore,
           answers: answers as any,
           recommended_paths: totalScore >= 60 ? [path || ""] : [],
+          duration_seconds: durationSeconds,
           feedback: totalScore >= 80
             ? (locale === "ar" ? "أداء ممتاز! هذا المسار يناسبك" : "Excellent! This path suits you well")
             : totalScore >= 60
