@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import heroPattern from "@/assets/hero-pattern.jpg";
 
 const HeroSection: React.FC = () => {
   const { t, locale } = useLanguage();
+  const navigate = useNavigate();
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -54,6 +56,7 @@ const HeroSection: React.FC = () => {
             <Button
               size="lg"
               className="rounded-full px-8 text-base gradient-gold text-accent-foreground hover:opacity-90 border-0"
+              onClick={() => navigate("/auth")}
             >
               {t.hero.cta}
             </Button>
@@ -61,6 +64,7 @@ const HeroSection: React.FC = () => {
               variant="outline"
               size="lg"
               className="rounded-full px-8 text-base border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+              onClick={() => document.getElementById("paths")?.scrollIntoView({ behavior: "smooth" })}
             >
               {t.hero.secondary}
             </Button>

@@ -1,10 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Globe } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Globe, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header: React.FC = () => {
   const { locale, setLocale, t } = useLanguage();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -38,9 +42,20 @@ const Header: React.FC = () => {
             <Globe className="w-4 h-4" />
             {locale === "ar" ? "EN" : "عربي"}
           </button>
-          <Button size="sm" className="rounded-full">
-            {t.nav.start}
-          </Button>
+          {user ? (
+            <>
+              <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/dashboard")}>
+                {locale === "ar" ? "لوحة التحكم" : "Dashboard"}
+              </Button>
+              <Button size="sm" variant="ghost" className="rounded-full" onClick={() => signOut()}>
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" className="rounded-full" onClick={() => navigate("/auth")}>
+              {t.nav.start}
+            </Button>
+          )}
         </div>
       </div>
     </header>
