@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
           <div className="w-8 h-8 rounded-lg gradient-hero flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">ت</span>
           </div>
@@ -23,15 +23,15 @@ const Header: React.FC = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#home" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => navigate("/")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             {t.nav.home}
-          </a>
-          <a href="#paths" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </button>
+          <button onClick={() => { navigate("/"); setTimeout(() => document.getElementById("paths")?.scrollIntoView({ behavior: "smooth" }), 100); }} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             {t.nav.paths}
-          </a>
-          <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </button>
+          <button onClick={() => { navigate("/"); setTimeout(() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" }), 100); }} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             {t.nav.about}
-          </a>
+          </button>
         </nav>
 
         <div className="flex items-center gap-3">
