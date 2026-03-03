@@ -4,10 +4,11 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
-import { Heart, Code, Briefcase, BookOpen, ArrowRight, Clock, CheckCircle } from "lucide-react";
+import { Heart, Code, Briefcase, BookOpen, GraduationCap, ArrowRight, Clock, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const pathData = [
+  { key: "general", icon: GraduationCap, color: "general", duration: "~20" },
   { key: "health", icon: Heart, color: "health", duration: "~25" },
   { key: "cs", icon: Code, color: "cs", duration: "~30" },
   { key: "business", icon: Briefcase, color: "business", duration: "~20" },
@@ -15,6 +16,7 @@ const pathData = [
 ] as const;
 
 const colorMap = {
+  general: { bg: "bg-general/10", text: "text-general", border: "border-general/30", solid: "bg-general" },
   health: { bg: "bg-health/10", text: "text-health", border: "border-health/30", solid: "bg-health" },
   cs: { bg: "bg-cs/10", text: "text-cs", border: "border-cs/30", solid: "bg-cs" },
   business: { bg: "bg-business/10", text: "text-business", border: "border-business/30", solid: "bg-business" },

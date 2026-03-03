@@ -77,6 +77,10 @@ export default {
           DEFAULT: "hsl(var(--shariah))",
           foreground: "hsl(var(--shariah-foreground))",
         },
+        general: {
+          DEFAULT: "hsl(var(--general))",
+          foreground: "hsl(var(--general-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
