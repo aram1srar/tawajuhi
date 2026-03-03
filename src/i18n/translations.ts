@@ -59,8 +59,8 @@ const translations = {
       start: "Start Test",
     },
     hero: {
-      title: "Discover Your",
-      subtitle: "Career Path",
+      title: "Discover Your Career Path",
+      subtitle: "With Tawajohi",
       description: "An interactive platform helping Saudi high school students choose the most suitable career path through real-world simulations and AI-powered assessment",
       cta: "Start Your Journey",
       secondary: "Learn More",
