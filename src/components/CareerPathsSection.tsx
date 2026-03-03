@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Heart, Code, Briefcase, BookOpen, GraduationCap, ArrowUpRight } from "lucide-react";
@@ -21,12 +22,8 @@ const colorClasses = {
 
 const CareerPathsSection: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const paths = ["general", "health", "cs", "business", "shariah"] as const;
-
-  const scrollToPath = (path: string) => {
-    const el = document.getElementById(`path-${path}`);
-    el?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <section id="paths" className="py-24 bg-background">
@@ -59,7 +56,7 @@ const CareerPathsSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                onClick={() => scrollToPath(path)}
+                onClick={() => navigate(`/path/${path}`)}
                 className={`group relative bg-card rounded-2xl border ${colors.border} p-8 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer`}
               >
                 <div className="flex items-start justify-between mb-6">
