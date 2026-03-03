@@ -266,6 +266,16 @@ const AuthPage: React.FC = () => {
               <Button type="submit" className="w-full rounded-lg" disabled={loading}>
                 {loading ? "..." : labels.submit}
               </Button>
+
+              {mode === "login" && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors mt-2"
+                >
+                  {locale === "ar" ? "نسيت كلمة المرور؟" : "Forgot Password?"}
+                </button>
+              )}
             </motion.form>
           </AnimatePresence>
         </div>
