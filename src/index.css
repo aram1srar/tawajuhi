@@ -45,6 +45,8 @@
     --business-foreground: 210 50% 10%;
     --shariah: 280 40% 45%;
     --shariah-foreground: 0 0% 100%;
+    --general: 200 40% 45%;
+    --general-foreground: 0 0% 100%;
 
     --gradient-hero: linear-gradient(135deg, hsl(175, 60%, 28%), hsl(210, 50%, 20%));
     --gradient-gold: linear-gradient(135deg, hsl(42, 90%, 55%), hsl(35, 85%, 45%));

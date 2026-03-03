@@ -1,9 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Heart, Code, Briefcase, BookOpen, ArrowUpRight } from "lucide-react";
+import { Heart, Code, Briefcase, BookOpen, GraduationCap, ArrowUpRight } from "lucide-react";
 
 const icons = {
+  general: GraduationCap,
   health: Heart,
   cs: Code,
   business: Briefcase,
@@ -11,6 +12,7 @@ const icons = {
 };
 
 const colorClasses = {
+  general: { bg: "bg-general/10", text: "text-general", border: "border-general/20", badge: "bg-general/15 text-general" },
   health: { bg: "bg-health/10", text: "text-health", border: "border-health/20", badge: "bg-health/15 text-health" },
   cs: { bg: "bg-cs/10", text: "text-cs", border: "border-cs/20", badge: "bg-cs/15 text-cs" },
   business: { bg: "bg-business/10", text: "text-business", border: "border-business/20", badge: "bg-business/15 text-business" },
@@ -19,7 +21,12 @@ const colorClasses = {
 
 const CareerPathsSection: React.FC = () => {
   const { t } = useLanguage();
-  const paths = ["health", "cs", "business", "shariah"] as const;
+  const paths = ["general", "health", "cs", "business", "shariah"] as const;
+
+  const scrollToPath = (path: string) => {
+    const el = document.getElementById(`path-${path}`);
+    el?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <section id="paths" className="py-24 bg-background">
@@ -39,7 +46,7 @@ const CareerPathsSection: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {paths.map((path, index) => {
             const Icon = icons[path];
             const colors = colorClasses[path];
@@ -52,6 +59,7 @@ const CareerPathsSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
+                onClick={() => scrollToPath(path)}
                 className={`group relative bg-card rounded-2xl border ${colors.border} p-8 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer`}
               >
                 <div className="flex items-start justify-between mb-6">
@@ -65,12 +73,12 @@ const CareerPathsSection: React.FC = () => {
                   {data.title}
                 </h3>
 
-                <p className="text-muted-foreground mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed text-sm">
                   {data.description}
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                  {data.skills.map((skill) => (
+                  {data.skills.slice(0, 3).map((skill) => (
                     <span
                       key={skill}
                       className={`px-3 py-1 rounded-full text-xs font-medium ${colors.badge}`}
