@@ -1,40 +1,31 @@
 import React, { useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { questions } from "@/data/questions";
+import { getGeneralExamQuestions, Question } from "@/data/questions";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, CheckCircle, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 
-const TestPage: React.FC = () => {
-  const { path } = useParams<{ path: string }>();
+const GeneralExamPage: React.FC = () => {
   const { locale } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const pathQuestions = useMemo(() => questions[path || ""] || [], [path]);
+  const examQuestions = useMemo(() => getGeneralExamQuestions(40), []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [finished, setFinished] = useState(false);
   const [saving, setSaving] = useState(false);
   const [startTime] = useState(() => Date.now());
 
-  const current = pathQuestions[currentIndex];
-  const progress = ((currentIndex + (showExplanation ? 1 : 0)) / pathQuestions.length) * 100;
-
-  const pathNames: Record<string, { ar: string; en: string }> = {
-    health: { ar: "العلوم الصحية", en: "Health Sciences" },
-    cs: { ar: "علوم الحاسب", en: "Computer Science" },
-    business: { ar: "إدارة الأعمال", en: "Business Admin" },
-    shariah: { ar: "الشريعة", en: "Shari'ah" },
-  };
+  const current = examQuestions[currentIndex];
+  const progress = ((currentIndex + (showExplanation ? 1 : 0)) / examQuestions.length) * 100;
 
   const handleSelect = (optionIndex: number) => {
     if (showExplanation) return;
@@ -44,26 +35,29 @@ const TestPage: React.FC = () => {
   };
 
   const handleNext = async () => {
-    if (currentIndex < pathQuestions.length - 1) {
+    if (currentIndex < examQuestions.length - 1) {
       setCurrentIndex((i) => i + 1);
       setSelectedOption(null);
       setShowExplanation(false);
     } else {
-      // Calculate scores
-      let theoryCorrect = 0, interestCorrect = 0, theoryTotal = 0, interestTotal = 0;
-      pathQuestions.forEach((q) => {
-        if (q.type === "theory") {
-          theoryTotal++;
-          if (answers[q.id] === q.correctIndex) theoryCorrect++;
-        } else {
-          interestTotal++;
-          if (answers[q.id] === q.correctIndex) interestCorrect++;
-        }
+      // Calculate scores per path
+      const pathScores: Record<string, { correct: number; total: number }> = {};
+      examQuestions.forEach((q) => {
+        if (!pathScores[q.path]) pathScores[q.path] = { correct: 0, total: 0 };
+        pathScores[q.path].total++;
+        if (answers[q.id] === q.correctIndex) pathScores[q.path].correct++;
       });
 
-      const theoryScore = theoryTotal > 0 ? Math.round((theoryCorrect / theoryTotal) * 100) : 0;
-      const simScore = interestTotal > 0 ? Math.round((interestCorrect / interestTotal) * 100) : 0;
-      const totalScore = Math.round(((theoryCorrect + interestCorrect) / pathQuestions.length) * 100);
+      const totalCorrect = Object.values(pathScores).reduce((s, p) => s + p.correct, 0);
+      const totalScore = Math.round((totalCorrect / examQuestions.length) * 100);
+
+      // Find best path
+      let bestPath = "";
+      let bestPct = 0;
+      Object.entries(pathScores).forEach(([path, { correct, total }]) => {
+        const pct = total > 0 ? correct / total : 0;
+        if (pct > bestPct) { bestPct = pct; bestPath = path; }
+      });
 
       const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
@@ -71,29 +65,27 @@ const TestPage: React.FC = () => {
         setSaving(true);
         await supabase.from("test_results").insert({
           user_id: user.id,
-          career_path: path || "",
-          theory_score: theoryScore,
-          simulation_score: simScore,
+          career_path: "general",
+          theory_score: totalScore,
+          simulation_score: 0,
           total_score: totalScore,
           answers: answers as any,
-          recommended_paths: totalScore >= 60 ? [path || ""] : [],
+          recommended_paths: bestPath ? [bestPath] : [],
           duration_seconds: durationSeconds,
-          feedback: totalScore >= 80
-            ? (locale === "ar" ? "أداء ممتاز! هذا المسار يناسبك" : "Excellent! This path suits you well")
-            : totalScore >= 60
-            ? (locale === "ar" ? "أداء جيد مع مجال للتحسين" : "Good performance with room for improvement")
-            : (locale === "ar" ? "تحتاج لمزيد من التحضير في هذا المسار" : "You need more preparation in this path"),
+          feedback: locale === "ar"
+            ? `أفضل مسار لك: ${bestPath}`
+            : `Best path for you: ${bestPath}`,
         });
         setSaving(false);
       }
 
-      navigate(`/results/${path}`, {
+      navigate(`/results/general`, {
         state: {
-          theoryScore,
-          simScore,
           totalScore,
+          pathScores,
+          bestPath,
           answers,
-          questions: pathQuestions,
+          questions: examQuestions,
         },
       });
     }
@@ -109,30 +101,40 @@ const TestPage: React.FC = () => {
 
   const isCorrect = selectedOption === current.correctIndex;
 
+  const pathLabels: Record<string, { ar: string; en: string }> = {
+    cs: { ar: "علوم الحاسب", en: "Computer Science" },
+    health: { ar: "الصحة والحياة", en: "Health & Life" },
+    business: { ar: "إدارة الأعمال", en: "Business" },
+    shariah: { ar: "الشريعة", en: "Shari'ah" },
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
-            <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <button onClick={() => navigate("/")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4" />
               {locale === "ar" ? "رجوع" : "Back"}
             </button>
             <div className="flex items-center gap-2">
               <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                {pathLabels[current.path]?.[locale] || current.path}
+              </span>
+              <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
                 {current.type === "theory"
                   ? (locale === "ar" ? "نظري" : "Theory")
-                  : (locale === "ar" ? "محاكاة" : "Simulation")}
+                  : (locale === "ar" ? "ميول" : "Interest")}
               </span>
               <span className="text-sm font-medium text-foreground">
-                {currentIndex + 1}/{pathQuestions.length}
+                {currentIndex + 1}/{examQuestions.length}
               </span>
             </div>
           </div>
           <Progress value={progress} className="h-2" />
           <p className="text-xs text-muted-foreground mt-2">
-            {pathNames[path || ""]?.[locale] || path}
+            {locale === "ar" ? "الاختبار العام - جميع المسارات" : "General Exam - All Paths"}
           </p>
         </div>
       </div>
@@ -190,7 +192,6 @@ const TestPage: React.FC = () => {
               })}
             </div>
 
-            {/* Explanation */}
             {showExplanation && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -207,7 +208,7 @@ const TestPage: React.FC = () => {
             {showExplanation && (
               <div className="mt-8 flex justify-end">
                 <Button onClick={handleNext} className="rounded-full px-8" disabled={saving}>
-                  {currentIndex < pathQuestions.length - 1
+                  {currentIndex < examQuestions.length - 1
                     ? (locale === "ar" ? "التالي" : "Next")
                     : (locale === "ar" ? "عرض النتائج" : "View Results")}
                   <ArrowRight className="w-4 h-4 ms-2" />
@@ -221,4 +222,4 @@ const TestPage: React.FC = () => {
   );
 };
 
-export default TestPage;
+export default GeneralExamPage;

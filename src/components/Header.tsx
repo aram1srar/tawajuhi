@@ -61,7 +61,7 @@ const Header: React.FC = () => {
                 <Globe className="w-4 h-4" />
                 {locale === "ar" ? "EN" : "عربي"}
               </button>
-              <Button size="sm" className="rounded-full" onClick={() => navigate("/auth")}>
+              <Button size="sm" className="rounded-full" onClick={() => navigate("/general-exam")}>
                 {t.nav.start}
               </Button>
             </>
