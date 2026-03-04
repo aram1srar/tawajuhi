@@ -6,39 +6,89 @@ import { supabase } from "@/integrations/supabase/client";
 import { getGeneralExamQuestions, Question } from "@/data/questions";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, CheckCircle, XCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+
+const ExamIntro: React.FC<{ onStart: () => void }> = ({ onStart }) => {
+  const { locale } = useLanguage();
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-lg mx-auto px-6 text-center"
+      >
+        <div className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-6">
+          <BookOpen className="w-8 h-8 text-primary-foreground" />
+        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-3">
+          {locale === "ar" ? "الاختبار العام" : "General Exam"}
+        </h1>
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          {locale === "ar"
+            ? "40 سؤال من جميع المسارات المهنية. أجب بصدق لنحدد المسار الأنسب لك."
+            : "40 questions across all career paths. Answer honestly so we can find the best path for you."}
+        </p>
+        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground mb-8">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4" />
+            <span>{locale === "ar" ? "40 سؤال" : "40 Questions"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            <span>{locale === "ar" ? "~15 دقيقة" : "~15 min"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            <span>{locale === "ar" ? "تحليل ذكي" : "AI Analysis"}</span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button size="lg" className="rounded-full px-10 gradient-gold text-accent-foreground border-0" onClick={onStart}>
+            {locale === "ar" ? "ابدأ الاختبار" : "Start Exam"}
+          </Button>
+          <Button variant="ghost" size="sm" className="rounded-full" onClick={() => navigate("/")}>
+            <ArrowLeft className="w-4 h-4 me-1" />
+            {locale === "ar" ? "رجوع" : "Back"}
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
 const GeneralExamPage: React.FC = () => {
   const { locale } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
+  const [started, setStarted] = useState(false);
   const examQuestions = useMemo(() => getGeneralExamQuestions(40), []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
+  const [questionTimestamps, setQuestionTimestamps] = useState<Record<string, number>>({});
+  const [questionStartTime, setQuestionStartTime] = useState(() => Date.now());
   const [saving, setSaving] = useState(false);
   const [startTime] = useState(() => Date.now());
 
+  if (!started) return <ExamIntro onStart={() => { setStarted(true); setQuestionStartTime(Date.now()); }} />;
+
   const current = examQuestions[currentIndex];
-  const progress = ((currentIndex + (showExplanation ? 1 : 0)) / examQuestions.length) * 100;
+  const progress = ((currentIndex) / examQuestions.length) * 100;
 
   const handleSelect = (optionIndex: number) => {
-    if (showExplanation) return;
-    setSelectedOption(optionIndex);
+    if (answers[current.id] !== undefined) return;
+    const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
     setAnswers((prev) => ({ ...prev, [current.id]: optionIndex }));
-    setShowExplanation(true);
+    setQuestionTimestamps((prev) => ({ ...prev, [current.id]: timeTaken }));
   };
 
   const handleNext = async () => {
     if (currentIndex < examQuestions.length - 1) {
       setCurrentIndex((i) => i + 1);
-      setSelectedOption(null);
-      setShowExplanation(false);
+      setQuestionStartTime(Date.now());
     } else {
       // Calculate scores per path
       const pathScores: Record<string, { correct: number; total: number }> = {};
@@ -50,6 +100,7 @@ const GeneralExamPage: React.FC = () => {
 
       const totalCorrect = Object.values(pathScores).reduce((s, p) => s + p.correct, 0);
       const totalScore = Math.round((totalCorrect / examQuestions.length) * 100);
+      const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
       // Find best path
       let bestPath = "";
@@ -59,8 +110,7 @@ const GeneralExamPage: React.FC = () => {
         if (pct > bestPct) { bestPct = pct; bestPath = path; }
       });
 
-      const durationSeconds = Math.round((Date.now() - startTime) / 1000);
-
+      // Save to DB
       if (user) {
         setSaving(true);
         await supabase.from("test_results").insert({
@@ -72,9 +122,6 @@ const GeneralExamPage: React.FC = () => {
           answers: answers as any,
           recommended_paths: bestPath ? [bestPath] : [],
           duration_seconds: durationSeconds,
-          feedback: locale === "ar"
-            ? `أفضل مسار لك: ${bestPath}`
-            : `Best path for you: ${bestPath}`,
         });
         setSaving(false);
       }
@@ -86,6 +133,8 @@ const GeneralExamPage: React.FC = () => {
           bestPath,
           answers,
           questions: examQuestions,
+          questionTimestamps,
+          durationSeconds,
         },
       });
     }
@@ -99,14 +148,14 @@ const GeneralExamPage: React.FC = () => {
     );
   }
 
-  const isCorrect = selectedOption === current.correctIndex;
-
   const pathLabels: Record<string, { ar: string; en: string }> = {
     cs: { ar: "علوم الحاسب", en: "Computer Science" },
     health: { ar: "الصحة والحياة", en: "Health & Life" },
     business: { ar: "إدارة الأعمال", en: "Business" },
     shariah: { ar: "الشريعة", en: "Shari'ah" },
   };
+
+  const answered = answers[current.id] !== undefined;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -122,20 +171,12 @@ const GeneralExamPage: React.FC = () => {
               <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
                 {pathLabels[current.path]?.[locale] || current.path}
               </span>
-              <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
-                {current.type === "theory"
-                  ? (locale === "ar" ? "نظري" : "Theory")
-                  : (locale === "ar" ? "ميول" : "Interest")}
-              </span>
               <span className="text-sm font-medium text-foreground">
                 {currentIndex + 1}/{examQuestions.length}
               </span>
             </div>
           </div>
           <Progress value={progress} className="h-2" />
-          <p className="text-xs text-muted-foreground mt-2">
-            {locale === "ar" ? "الاختبار العام - جميع المسارات" : "General Exam - All Paths"}
-          </p>
         </div>
       </div>
 
@@ -156,23 +197,15 @@ const GeneralExamPage: React.FC = () => {
             <div className="space-y-3">
               {current.options.map((option, idx) => {
                 let optionStyle = "border-border bg-card hover:border-primary/50";
-                if (showExplanation) {
-                  if (idx === current.correctIndex) {
-                    optionStyle = "border-green-500 bg-green-50 dark:bg-green-900/20";
-                  } else if (idx === selectedOption && !isCorrect) {
-                    optionStyle = "border-destructive bg-red-50 dark:bg-red-900/20";
-                  } else {
-                    optionStyle = "border-border bg-card opacity-50";
-                  }
-                } else if (selectedOption === idx) {
-                  optionStyle = "border-primary bg-primary/5";
+                if (answered && answers[current.id] === idx) {
+                  optionStyle = "border-primary bg-primary/10";
                 }
 
                 return (
                   <button
                     key={idx}
                     onClick={() => handleSelect(idx)}
-                    disabled={showExplanation}
+                    disabled={answered}
                     className={`w-full text-start p-4 rounded-xl border-2 transition-all ${optionStyle}`}
                   >
                     <div className="flex items-center gap-3">
@@ -180,32 +213,13 @@ const GeneralExamPage: React.FC = () => {
                         {String.fromCharCode(65 + idx)}
                       </span>
                       <span className="text-foreground font-medium">{option[locale]}</span>
-                      {showExplanation && idx === current.correctIndex && (
-                        <CheckCircle className="w-5 h-5 text-green-500 ms-auto shrink-0" />
-                      )}
-                      {showExplanation && idx === selectedOption && !isCorrect && (
-                        <XCircle className="w-5 h-5 text-destructive ms-auto shrink-0" />
-                      )}
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            {showExplanation && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`mt-6 p-5 rounded-xl border ${isCorrect ? "border-green-200 bg-green-50 dark:bg-green-900/10" : "border-red-200 bg-red-50 dark:bg-red-900/10"}`}
-              >
-                <p className={`text-sm font-medium mb-1 ${isCorrect ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}`}>
-                  {isCorrect ? (locale === "ar" ? "✅ إجابة صحيحة!" : "✅ Correct!") : (locale === "ar" ? "❌ إجابة خاطئة" : "❌ Incorrect")}
-                </p>
-                <p className="text-sm text-muted-foreground">{current.explanation[locale]}</p>
-              </motion.div>
-            )}
-
-            {showExplanation && (
+            {answered && (
               <div className="mt-8 flex justify-end">
                 <Button onClick={handleNext} className="rounded-full px-8" disabled={saving}>
                   {currentIndex < examQuestions.length - 1
