@@ -1,5 +1,23 @@
 # Welcome to your Lovable project
 
+## Open the site locally (Node.js)
+
+**Requirements:** [Node.js](https://nodejs.org/) 18 or newer.
+
+```sh
+# Install dependencies
+npm install
+
+# Start the dev server (opens at http://localhost:8080)
+npm start
+```
+
+Or use `npm run dev` for the same result. Then open **http://localhost:8080** in your browser.
+
+If you use Supabase, copy `.env.example` to `.env` and add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+
+---
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
