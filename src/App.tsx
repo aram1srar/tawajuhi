@@ -14,6 +14,7 @@ import MyResultsPage from "./pages/MyResultsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CareerPathPage from "./pages/CareerPathPage";
+import GeneralExamPage from "./pages/GeneralExamPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/general-exam" element={<ProtectedRoute><GeneralExamPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/test/:path" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
               <Route path="/results/:path" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />

@@ -26,7 +26,7 @@ const AuthPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [captcha, setCaptcha] = useState(generateCaptcha);
   const [captchaInput, setCaptchaInput] = useState("");
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user: currentUser } = useAuth();
   const { locale, setLocale } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -39,6 +39,13 @@ const AuthPage: React.FC = () => {
   useEffect(() => {
     refreshCaptcha();
   }, [mode, refreshCaptcha]);
+
+  // Redirect if already logged in (e.g. after Google OAuth)
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/", { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const labels = locale === "ar" ? {
     login: "تسجيل الدخول",

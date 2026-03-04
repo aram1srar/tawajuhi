@@ -2,260 +2,97 @@ import type { Locale } from "@/i18n/translations";
 
 export interface Question {
   id: string;
-  type: "theory" | "simulation";
+  type: "theory" | "interest";
   question: { ar: string; en: string };
   options: { ar: string; en: string }[];
   correctIndex: number;
   explanation: { ar: string; en: string };
+  path: "cs" | "health" | "business" | "shariah";
 }
 
 export const questions: Record<string, Question[]> = {
-  health: [
-    {
-      id: "h1", type: "theory",
-      question: { ar: "ما هو العضو المسؤول عن ضخ الدم في جسم الإنسان؟", en: "Which organ is responsible for pumping blood in the human body?" },
-      options: [
-        { ar: "الكبد", en: "Liver" },
-        { ar: "القلب", en: "Heart" },
-        { ar: "الرئتان", en: "Lungs" },
-        { ar: "الكلى", en: "Kidneys" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "القلب هو العضو المسؤول عن ضخ الدم إلى جميع أنحاء الجسم", en: "The heart is the organ responsible for pumping blood throughout the body" },
-    },
-    {
-      id: "h2", type: "simulation",
-      question: { ar: "مريض يعاني من حروق من الدرجة الثانية. ما هو أول إجراء يجب اتخاذه؟", en: "A patient has second-degree burns. What is the first action to take?" },
-      options: [
-        { ar: "وضع الثلج مباشرة", en: "Apply ice directly" },
-        { ar: "تبريد المنطقة بالماء الجاري لمدة 10-20 دقيقة", en: "Cool with running water for 10-20 minutes" },
-        { ar: "وضع الزبدة على الحرق", en: "Apply butter to the burn" },
-        { ar: "فقع الفقاعات", en: "Pop the blisters" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "تبريد الحرق بالماء الجاري هو الإسعاف الأولي الصحيح للحروق", en: "Cooling with running water is the correct first aid for burns" },
-    },
-    {
-      id: "h3", type: "theory",
-      question: { ar: "أي من التالي ليس من أعراض مرض السكري؟", en: "Which of the following is NOT a symptom of diabetes?" },
-      options: [
-        { ar: "كثرة التبول", en: "Frequent urination" },
-        { ar: "العطش الشديد", en: "Excessive thirst" },
-        { ar: "زيادة الوزن السريعة", en: "Rapid weight gain" },
-        { ar: "بطء التئام الجروح", en: "Slow wound healing" },
-      ],
-      correctIndex: 2,
-      explanation: { ar: "فقدان الوزن غير المبرر هو العرض الأكثر شيوعاً وليس زيادة الوزن", en: "Unexplained weight loss is a common symptom, not weight gain" },
-    },
-    {
-      id: "h4", type: "simulation",
-      question: { ar: "شخص فاقد للوعي ولكنه يتنفس. ما هو الوضع الصحيح لوضعه فيه؟", en: "An unconscious person is breathing. What is the correct position to place them in?" },
-      options: [
-        { ar: "على الظهر مع رفع الرأس", en: "On back with head elevated" },
-        { ar: "وضع الإفاقة (الجانبي)", en: "Recovery position (side)" },
-        { ar: "الجلوس", en: "Sitting up" },
-        { ar: "على البطن", en: "Face down" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "وضع الإفاقة يحمي مجرى التنفس ويمنع الاختناق", en: "Recovery position protects the airway and prevents choking" },
-    },
-    {
-      id: "h5", type: "theory",
-      question: { ar: "ما هي الوحدة الأساسية للجهاز العصبي؟", en: "What is the basic unit of the nervous system?" },
-      options: [
-        { ar: "الخلية العصبية (العصبون)", en: "Neuron" },
-        { ar: "خلايا الدم الحمراء", en: "Red blood cells" },
-        { ar: "الصفائح الدموية", en: "Platelets" },
-        { ar: "الخلايا الليمفاوية", en: "Lymphocytes" },
-      ],
-      correctIndex: 0,
-      explanation: { ar: "العصبون هو الوحدة البنائية والوظيفية للجهاز العصبي", en: "Neurons are the structural and functional units of the nervous system" },
-    },
-  ],
   cs: [
-    {
-      id: "c1", type: "theory",
-      question: { ar: "ما هو الناتج من: console.log(typeof null)؟", en: "What is the output of: console.log(typeof null)?" },
-      options: [
-        { ar: "null", en: "null" },
-        { ar: "undefined", en: "undefined" },
-        { ar: "object", en: "object" },
-        { ar: "string", en: "string" },
-      ],
-      correctIndex: 2,
-      explanation: { ar: "في JavaScript، typeof null يُرجع 'object' وهذا خطأ معروف في اللغة", en: "In JavaScript, typeof null returns 'object' — this is a known bug in the language" },
-    },
-    {
-      id: "c2", type: "simulation",
-      question: { ar: "تطبيق ويب يعاني من بطء شديد. أي من التالي يجب فحصه أولاً؟", en: "A web app is extremely slow. Which should you check first?" },
-      options: [
-        { ar: "تغيير لون الواجهة", en: "Change the UI color" },
-        { ar: "فحص استعلامات قاعدة البيانات والشبكة", en: "Check database queries and network" },
-        { ar: "إضافة المزيد من الصفحات", en: "Add more pages" },
-        { ar: "تغيير الخط", en: "Change the font" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "البداية بفحص الأداء عبر الشبكة وقاعدة البيانات هي الخطوة الأولى", en: "Starting with network and database performance checks is the first step" },
-    },
-    {
-      id: "c3", type: "theory",
-      question: { ar: "ما هو تعقيد البحث الثنائي (Binary Search)؟", en: "What is the time complexity of Binary Search?" },
-      options: [
-        { ar: "O(n)", en: "O(n)" },
-        { ar: "O(log n)", en: "O(log n)" },
-        { ar: "O(n²)", en: "O(n²)" },
-        { ar: "O(1)", en: "O(1)" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "البحث الثنائي يقسم المجموعة إلى نصفين في كل خطوة", en: "Binary search halves the dataset at each step, giving O(log n)" },
-    },
-    {
-      id: "c4", type: "simulation",
-      question: { ar: "تحتاج لتخزين بيانات المستخدمين بشكل آمن. أي طريقة الأفضل؟", en: "You need to store user data securely. Which approach is best?" },
-      options: [
-        { ar: "تخزينها كنص عادي", en: "Store as plain text" },
-        { ar: "تشفير البيانات الحساسة وتجزئة كلمات المرور", en: "Encrypt sensitive data and hash passwords" },
-        { ar: "إرسالها عبر البريد الإلكتروني", en: "Send via email" },
-        { ar: "حفظها في ملف نصي على السيرفر", en: "Save in a text file on server" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "تشفير البيانات وتجزئة كلمات المرور هي أفضل ممارسات الأمان", en: "Encrypting data and hashing passwords are security best practices" },
-    },
-    {
-      id: "c5", type: "theory",
-      question: { ar: "أي من التالي هو بروتوكول لنقل البيانات عبر الإنترنت؟", en: "Which protocol is used for data transfer over the internet?" },
-      options: [
-        { ar: "HTML", en: "HTML" },
-        { ar: "CSS", en: "CSS" },
-        { ar: "HTTP", en: "HTTP" },
-        { ar: "SQL", en: "SQL" },
-      ],
-      correctIndex: 2,
-      explanation: { ar: "HTTP هو بروتوكول نقل النص التشعبي المستخدم في الويب", en: "HTTP (HyperText Transfer Protocol) is used for web data transfer" },
-    },
+    // Scientific/Technical (8)
+    { id: "cs1", type: "theory", path: "cs", question: { ar: "أي من المكونات التالية يعتبر \"عقل\" الحاسب؟", en: "Which of the following is considered the \"brain\" of the computer?" }, options: [{ ar: "الرام", en: "RAM" }, { ar: "المعالج", en: "Processor (CPU)" }, { ar: "القرص الصلب", en: "Hard Drive" }], correctIndex: 1, explanation: { ar: "المعالج (CPU) هو العنصر المسؤول عن تنفيذ العمليات الحسابية والمنطقية", en: "The CPU executes all computational and logical operations" } },
+    { id: "cs2", type: "theory", path: "cs", question: { ar: "لغة البرمجة التي تُستخدم بكثرة في مجال الذكاء الاصطناعي هي:", en: "The programming language widely used in AI is:" }, options: [{ ar: "Python", en: "Python" }, { ar: "HTML", en: "HTML" }, { ar: "CSS", en: "CSS" }], correctIndex: 0, explanation: { ar: "Python هي اللغة الأكثر استخداماً في مجال الذكاء الاصطناعي وتعلم الآلة", en: "Python is the most widely used language in AI and machine learning" } },
+    { id: "cs3", type: "theory", path: "cs", question: { ar: "أصغر وحدة لتخزين البيانات في الحاسب هي:", en: "The smallest unit of data storage in a computer is:" }, options: [{ ar: "بايت", en: "Byte" }, { ar: "بت", en: "Bit" }, { ar: "ميجابايت", en: "Megabyte" }], correctIndex: 1, explanation: { ar: "البت (Bit) هو أصغر وحدة لتخزين البيانات ويمثل 0 أو 1", en: "A Bit is the smallest data unit, representing 0 or 1" } },
+    { id: "cs4", type: "theory", path: "cs", question: { ar: "الرمز الذي يمثل \"البوابة المنطقية\" التي تعطي مخرجاً صحيحاً فقط إذا كان جميع المدخلات صحيحة:", en: "The logic gate that outputs true only when ALL inputs are true:" }, options: [{ ar: "OR", en: "OR" }, { ar: "AND", en: "AND" }, { ar: "NOT", en: "NOT" }], correctIndex: 1, explanation: { ar: "بوابة AND تعطي مخرجاً صحيحاً فقط عندما تكون جميع المدخلات صحيحة", en: "AND gate outputs true only when all inputs are true" } },
+    { id: "cs5", type: "theory", path: "cs", question: { ar: "نظام الترقيم الذي يعتمد عليه الحاسب في معالجة البيانات هو:", en: "The numbering system computers use to process data is:" }, options: [{ ar: "العشري", en: "Decimal" }, { ar: "الثنائي", en: "Binary" }, { ar: "الستة عشري", en: "Hexadecimal" }], correctIndex: 1, explanation: { ar: "النظام الثنائي (0 و 1) هو أساس عمل الحاسب", en: "Binary (0 and 1) is the foundation of computer processing" } },
+    { id: "cs6", type: "theory", path: "cs", question: { ar: "\"البرمجيات الخبيثة\" التي تشفر ملفات المستخدم وتطلب مقابلاً مادياً هي:", en: "Malware that encrypts user files and demands payment is:" }, options: [{ ar: "الفيروسات", en: "Viruses" }, { ar: "فدية (Ransomware)", en: "Ransomware" }, { ar: "الديدان", en: "Worms" }], correctIndex: 1, explanation: { ar: "برامج الفدية تشفر الملفات وتطلب مبلغاً مالياً لفك التشفير", en: "Ransomware encrypts files and demands payment for decryption" } },
+    { id: "cs7", type: "theory", path: "cs", question: { ar: "ما هو البروتوكول المسؤول عن نقل صفحات الويب بأمان؟", en: "Which protocol is responsible for secure web page transfer?" }, options: [{ ar: "FTP", en: "FTP" }, { ar: "HTTP", en: "HTTP" }, { ar: "HTTPS", en: "HTTPS" }], correctIndex: 2, explanation: { ar: "HTTPS يضيف طبقة تشفير SSL/TLS لحماية البيانات أثناء النقل", en: "HTTPS adds SSL/TLS encryption to protect data during transfer" } },
+    { id: "cs8", type: "theory", path: "cs", question: { ar: "تقنية تسمح للأجهزة بالتواصل مع بعضها عبر الإنترنت دون تدخل بشري:", en: "Technology that allows devices to communicate over the internet without human intervention:" }, options: [{ ar: "الواقع الافتراضي", en: "Virtual Reality" }, { ar: "إنترنت الأشياء", en: "Internet of Things (IoT)" }, { ar: "الحوسبة السحابية", en: "Cloud Computing" }], correctIndex: 1, explanation: { ar: "إنترنت الأشياء (IoT) يربط الأجهزة ببعضها عبر الإنترنت", en: "IoT connects devices to each other via the internet" } },
+    // Interest (6)
+    { id: "cs9", type: "interest", path: "cs", question: { ar: "هل تفضل قضاء وقت فراغك في تعلم كيفية عمل تطبيق معين؟", en: "Do you prefer spending free time learning how a specific app works?" }, options: [{ ar: "نعم بشدة", en: "Yes, definitely" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "الشغف بفهم التطبيقات مؤشر قوي على ملاءمة مسار علوم الحاسب", en: "Passion for understanding apps is a strong indicator for CS path" } },
+    { id: "cs10", type: "interest", path: "cs", question: { ar: "هل تستمتع بفك الأجهزة الإلكترونية القديمة لاستكشاف قطعها؟", en: "Do you enjoy taking apart old electronics to explore their components?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "ربما", en: "Maybe" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "حب الاستكشاف التقني يدل على ميول هندسية", en: "Curiosity about tech hardware indicates engineering inclination" } },
+    { id: "cs11", type: "interest", path: "cs", question: { ar: "هل تفضل حل المسائل الرياضية على كتابة المقالات الأدبية؟", en: "Do you prefer solving math problems over writing essays?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا فرق", en: "No difference" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "تفضيل الرياضيات يشير إلى التفكير المنطقي المطلوب في الحاسب", en: "Math preference indicates logical thinking needed in CS" } },
+    { id: "cs12", type: "interest", path: "cs", question: { ar: "هل يستهويك تصميم نماذج ثلاثية الأبعاد باستخدام الكمبيوتر؟", en: "Are you interested in designing 3D models using a computer?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "ليس كثيراً", en: "Not much" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "الاهتمام بالتصميم ثلاثي الأبعاد يتوافق مع الهندسة والحاسب", en: "Interest in 3D design aligns with engineering and CS" } },
+    { id: "cs13", type: "interest", path: "cs", question: { ar: "هل تشعر بالإثارة عند اكتشاف ثغرة تقنية أو حل مشكلة في جهاز؟", en: "Do you feel excited when discovering a tech bug or fixing a device problem?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "حب حل المشكلات التقنية من أهم صفات المبرمجين والمهندسين", en: "Loving tech problem-solving is key for programmers and engineers" } },
+    { id: "cs14", type: "interest", path: "cs", question: { ar: "هل تفضل العمل المنفرد على مشاريع تتطلب تركيزاً تقنياً عالياً؟", en: "Do you prefer working alone on projects requiring high technical focus?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "حسب المشروع", en: "Depends on the project" }], correctIndex: 0, explanation: { ar: "العمل المركز والمستقل شائع في مجال علوم الحاسب", en: "Focused independent work is common in computer science" } },
+  ],
+  health: [
+    // Scientific (8)
+    { id: "h1", type: "theory", path: "health", question: { ar: "أي جزء من الخلية يحتوي على المعلومات الوراثية (DNA)؟", en: "Which part of the cell contains genetic information (DNA)?" }, options: [{ ar: "السيتوبلازم", en: "Cytoplasm" }, { ar: "النواة", en: "Nucleus" }, { ar: "الفجوة", en: "Vacuole" }], correctIndex: 1, explanation: { ar: "النواة تحتوي على الحمض النووي DNA الذي يحمل المعلومات الوراثية", en: "The nucleus contains DNA carrying genetic information" } },
+    { id: "h2", type: "theory", path: "health", question: { ar: "العملية التي يقوم بها النبات لصنع غذائه باستخدام الضوء هي:", en: "The process plants use to make food using light is:" }, options: [{ ar: "التنفس", en: "Respiration" }, { ar: "البناء الضوئي", en: "Photosynthesis" }, { ar: "التخمر", en: "Fermentation" }], correctIndex: 1, explanation: { ar: "البناء الضوئي يحوّل الطاقة الضوئية إلى غذاء للنبات", en: "Photosynthesis converts light energy into food for plants" } },
+    { id: "h3", type: "theory", path: "health", question: { ar: "فصيلة الدم التي تسمى \"المعطي العام\" هي:", en: "The blood type called the \"universal donor\" is:" }, options: [{ ar: "AB", en: "AB" }, { ar: "A", en: "A" }, { ar: "O", en: "O" }], correctIndex: 2, explanation: { ar: "فصيلة O سالب يمكن نقلها لجميع الفصائل الأخرى", en: "O negative can be donated to all other blood types" } },
+    { id: "h4", type: "theory", path: "health", question: { ar: "المادة الكيميائية التي تسرع التفاعلات الحيوية في الجسم هي:", en: "The chemical that speeds up biological reactions in the body is:" }, options: [{ ar: "السكر", en: "Sugar" }, { ar: "الإنزيم", en: "Enzyme" }, { ar: "الملح", en: "Salt" }], correctIndex: 1, explanation: { ar: "الإنزيمات محفزات بيولوجية تسرع التفاعلات الكيميائية في الجسم", en: "Enzymes are biological catalysts that speed up chemical reactions" } },
+    { id: "h5", type: "theory", path: "health", question: { ar: "الغاز الذي يحتاجه الإنسان في عملية التنفس الخلوي هو:", en: "The gas humans need for cellular respiration is:" }, options: [{ ar: "ثاني أكسيد الكربون", en: "Carbon Dioxide" }, { ar: "الأكسجين", en: "Oxygen" }, { ar: "النيتروجين", en: "Nitrogen" }], correctIndex: 1, explanation: { ar: "الأكسجين ضروري لعملية التنفس الخلوي وإنتاج الطاقة", en: "Oxygen is essential for cellular respiration and energy production" } },
+    { id: "h6", type: "theory", path: "health", question: { ar: "مرض \"السكري\" ينتج عن خلل في إفراز هرمون:", en: "Diabetes results from a disorder in the secretion of:" }, options: [{ ar: "الأدرينالين", en: "Adrenaline" }, { ar: "الثايروكسين", en: "Thyroxine" }, { ar: "الإنسولين", en: "Insulin" }], correctIndex: 2, explanation: { ar: "السكري ينتج عن نقص أو مقاومة الإنسولين المسؤول عن تنظيم السكر", en: "Diabetes results from insulin deficiency or resistance" } },
+    { id: "h7", type: "theory", path: "health", question: { ar: "الوحدة الأساسية لبناء الكائن الحي هي:", en: "The basic building unit of living organisms is:" }, options: [{ ar: "النسيج", en: "Tissue" }, { ar: "الخلية", en: "Cell" }, { ar: "العضو", en: "Organ" }], correctIndex: 1, explanation: { ar: "الخلية هي الوحدة الأساسية للتركيب والوظيفة في الكائنات الحية", en: "The cell is the basic structural and functional unit of life" } },
+    { id: "h8", type: "theory", path: "health", question: { ar: "علم دراسة التفاعلات بين الكائنات الحية وبيئتها هو:", en: "The science of studying interactions between organisms and their environment is:" }, options: [{ ar: "علم البيئة", en: "Ecology" }, { ar: "علم وظائف الأعضاء", en: "Physiology" }, { ar: "علم التشريح", en: "Anatomy" }], correctIndex: 0, explanation: { ar: "علم البيئة يدرس العلاقات بين الكائنات الحية وبيئتها", en: "Ecology studies relationships between organisms and their environment" } },
+    // Interest (6)
+    { id: "h9", type: "interest", path: "health", question: { ar: "هل تشعر بالرغبة في مساعدة الناس عند تعرضهم لوعكة صحية؟", en: "Do you feel the urge to help people when they're feeling unwell?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "الرغبة في المساعدة الصحية مؤشر قوي لمسار الصحة", en: "Desire to help with health issues strongly indicates the health path" } },
+    { id: "h10", type: "interest", path: "health", question: { ar: "هل تستمتع بمشاهدة البرامج الوثائقية عن جسم الإنسان أو الكائنات؟", en: "Do you enjoy watching documentaries about the human body or organisms?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "قليلاً", en: "A little" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "الاهتمام بعلوم الحياة يدل على ملاءمة المسار الصحي", en: "Interest in life sciences indicates health path suitability" } },
+    { id: "h11", type: "interest", path: "health", question: { ar: "هل لديك صبر لإجراء تجارب في المختبر ومراقبة النتائج؟", en: "Do you have patience for lab experiments and observing results?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "ربما", en: "Maybe" }], correctIndex: 0, explanation: { ar: "الصبر في المختبرات ضروري في المجال الصحي", en: "Lab patience is essential in the health field" } },
+    { id: "h12", type: "interest", path: "health", question: { ar: "هل تهتم بقراءة النشرات الدوائية ومعرفة آثارها الجانبية؟", en: "Do you care about reading drug leaflets and learning about side effects?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "نادراً", en: "Rarely" }], correctIndex: 0, explanation: { ar: "الاهتمام بالأدوية يدل على ميول صحية وطبية", en: "Interest in medications indicates medical inclination" } },
+    { id: "h13", type: "interest", path: "health", question: { ar: "هل تفضل العمل في بيئة المستشفيات والمراكز الصحية؟", en: "Do you prefer working in hospitals and health centers?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "لست متأكداً", en: "Not sure" }], correctIndex: 0, explanation: { ar: "تفضيل بيئة المستشفيات يتوافق مع المسار الصحي", en: "Preferring hospital environments aligns with the health path" } },
+    { id: "h14", type: "interest", path: "health", question: { ar: "هل يستهويك البحث عن حلول لمشاكل التلوث البيئي؟", en: "Are you interested in finding solutions for environmental pollution?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "أحياناً", en: "Sometimes" }], correctIndex: 0, explanation: { ar: "الاهتمام بالبيئة والصحة العامة جزء من المسار الصحي", en: "Environmental and public health interest is part of the health path" } },
   ],
   business: [
-    {
-      id: "b1", type: "theory",
-      question: { ar: "ما هي الخطوة الأولى في إعداد خطة عمل؟", en: "What is the first step in preparing a business plan?" },
-      options: [
-        { ar: "تحديد الميزانية", en: "Set the budget" },
-        { ar: "دراسة السوق وتحليل المنافسين", en: "Market research and competitor analysis" },
-        { ar: "توظيف الموظفين", en: "Hire employees" },
-        { ar: "تصميم الشعار", en: "Design the logo" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "دراسة السوق هي الأساس لبناء أي خطة عمل ناجحة", en: "Market research is the foundation for any successful business plan" },
-    },
-    {
-      id: "b2", type: "simulation",
-      question: { ar: "أنت مدير مشروع ولديك ميزانية محدودة. المشروع متأخر عن الجدول. ماذا تفعل؟", en: "You're a project manager with limited budget. The project is behind schedule. What do you do?" },
-      options: [
-        { ar: "تجاهل التأخير", en: "Ignore the delay" },
-        { ar: "إعادة ترتيب الأولويات وتركيز الموارد على المهام الحرجة", en: "Reprioritize and focus resources on critical tasks" },
-        { ar: "إلغاء المشروع", en: "Cancel the project" },
-        { ar: "طلب ميزانية إضافية فوراً", en: "Request additional budget immediately" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "إعادة ترتيب الأولويات يضمن إنجاز أهم المهام في الوقت المتاح", en: "Reprioritizing ensures the most critical tasks are completed on time" },
-    },
-    {
-      id: "b3", type: "theory",
-      question: { ar: "ما المقصود بـ ROI؟", en: "What does ROI stand for?" },
-      options: [
-        { ar: "مؤشر الأداء الرئيسي", en: "Key Performance Indicator" },
-        { ar: "العائد على الاستثمار", en: "Return on Investment" },
-        { ar: "إدارة الجودة الشاملة", en: "Total Quality Management" },
-        { ar: "تكلفة البضاعة المباعة", en: "Cost of Goods Sold" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "ROI هو مقياس لتقييم كفاءة وربحية الاستثمار", en: "ROI measures the efficiency and profitability of an investment" },
-    },
-    {
-      id: "b4", type: "simulation",
-      question: { ar: "عميل غاضب يهدد بإلغاء عقد كبير. ما أفضل نهج للتعامل؟", en: "An angry client threatens to cancel a major contract. What's the best approach?" },
-      options: [
-        { ar: "تجاهل شكواه", en: "Ignore their complaint" },
-        { ar: "الاستماع بعناية وتقديم حل بديل مع خطة تحسين", en: "Listen carefully and offer an alternative solution with improvement plan" },
-        { ar: "تقديم خصم كبير فوراً", en: "Offer a large discount immediately" },
-        { ar: "إحالته لموظف آخر", en: "Redirect to another employee" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "الاستماع الفعال وتقديم حلول عملية يبني الثقة ويحافظ على العلاقة", en: "Active listening and practical solutions build trust and maintain the relationship" },
-    },
-    {
-      id: "b5", type: "theory",
-      question: { ar: "أي من المصطلحات التالية يصف عملية تقسيم السوق إلى مجموعات؟", en: "Which term describes dividing the market into groups?" },
-      options: [
-        { ar: "التسعير", en: "Pricing" },
-        { ar: "تجزئة السوق", en: "Market Segmentation" },
-        { ar: "التوزيع", en: "Distribution" },
-        { ar: "الترويج", en: "Promotion" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "تجزئة السوق تساعد في استهداف العملاء المناسبين بمنتجات مخصصة", en: "Market segmentation helps target the right customers with tailored products" },
-    },
+    // Scientific (8)
+    { id: "b1", type: "theory", path: "business", question: { ar: "\"العرض والطلب\" هما الركيزتان الأساسيتان لعلم:", en: "\"Supply and demand\" are the two main pillars of:" }, options: [{ ar: "الإدارة", en: "Management" }, { ar: "الاقتصاد", en: "Economics" }, { ar: "المحاسبة", en: "Accounting" }], correctIndex: 1, explanation: { ar: "العرض والطلب من أساسيات علم الاقتصاد", en: "Supply and demand are fundamentals of economics" } },
+    { id: "b2", type: "theory", path: "business", question: { ar: "القائمة التي توضح أرباح وخسائر الشركة خلال فترة معينة هي:", en: "The statement showing a company's profits and losses over a period is:" }, options: [{ ar: "الميزانية", en: "Balance Sheet" }, { ar: "قائمة الدخل", en: "Income Statement" }, { ar: "التدفق النقدي", en: "Cash Flow" }], correctIndex: 1, explanation: { ar: "قائمة الدخل توضح الإيرادات والمصروفات والأرباح خلال فترة زمنية", en: "Income statement shows revenues, expenses, and profit over a period" } },
+    { id: "b3", type: "theory", path: "business", question: { ar: "عملية ترويج المنتجات للوصول إلى العميل المستهدف تسمى:", en: "The process of promoting products to reach target customers is called:" }, options: [{ ar: "التوزيع", en: "Distribution" }, { ar: "التسويق", en: "Marketing" }, { ar: "الإنتاج", en: "Production" }], correctIndex: 1, explanation: { ar: "التسويق يشمل جميع الأنشطة لترويج المنتجات وإيصالها للعملاء", en: "Marketing includes all activities to promote products and reach customers" } },
+    { id: "b4", type: "theory", path: "business", question: { ar: "\"رأس المال\" في المشاريع يشمل:", en: "\"Capital\" in business includes:" }, options: [{ ar: "الأموال فقط", en: "Money only" }, { ar: "الأموال والمعدات", en: "Money and equipment" }, { ar: "الموظفين فقط", en: "Employees only" }], correctIndex: 1, explanation: { ar: "رأس المال يشمل الأموال والأصول المادية مثل المعدات والمباني", en: "Capital includes money and physical assets like equipment and buildings" } },
+    { id: "b5", type: "theory", path: "business", question: { ar: "عندما ترتفع الأسعار بشكل مستمر، تسمى هذه الظاهرة:", en: "When prices rise continuously, this phenomenon is called:" }, options: [{ ar: "الركود", en: "Recession" }, { ar: "التضخم", en: "Inflation" }, { ar: "الكساد", en: "Depression" }], correctIndex: 1, explanation: { ar: "التضخم هو ارتفاع مستمر في المستوى العام للأسعار", en: "Inflation is a sustained increase in the general price level" } },
+    { id: "b6", type: "theory", path: "business", question: { ar: "الشخص الذي يتحمل المخاطرة لبدء مشروع جديد يسمى:", en: "A person who takes risks to start a new business is called:" }, options: [{ ar: "موظف", en: "Employee" }, { ar: "رائد أعمال", en: "Entrepreneur" }, { ar: "مستشار", en: "Consultant" }], correctIndex: 1, explanation: { ar: "رائد الأعمال يتحمل المخاطر المالية والإدارية لإنشاء مشروع جديد", en: "An entrepreneur takes financial and managerial risks to create a new venture" } },
+    { id: "b7", type: "theory", path: "business", question: { ar: "أي مما يلي يعتبر من الأصول (Assets) للشركة؟", en: "Which of the following is considered a company asset?" }, options: [{ ar: "القروض", en: "Loans" }, { ar: "المباني والأراضي", en: "Buildings and land" }, { ar: "الرواتب", en: "Salaries" }], correctIndex: 1, explanation: { ar: "المباني والأراضي من الأصول الثابتة التي تملكها الشركة", en: "Buildings and land are fixed assets owned by the company" } },
+    { id: "b8", type: "theory", path: "business", question: { ar: "وظيفة \"التخطيط\" في الإدارة تهدف إلى:", en: "The \"planning\" function in management aims to:" }, options: [{ ar: "تحديد الأهداف المستقبلية", en: "Set future goals" }, { ar: "مراقبة الموظفين", en: "Monitor employees" }, { ar: "دفع الفواتير", en: "Pay bills" }], correctIndex: 0, explanation: { ar: "التخطيط هو تحديد الأهداف ووضع الاستراتيجيات لتحقيقها", en: "Planning is setting goals and strategies to achieve them" } },
+    // Interest (6)
+    { id: "b9", type: "interest", path: "business", question: { ar: "هل تحب تنظيم الفعاليات وإدارة الميزانيات المخصصة لها؟", en: "Do you enjoy organizing events and managing their budgets?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "أحياناً", en: "Sometimes" }], correctIndex: 0, explanation: { ar: "حب التنظيم وإدارة الميزانيات مؤشر قوي لمسار إدارة الأعمال", en: "Loving organization and budgeting strongly indicates the business path" } },
+    { id: "b10", type: "interest", path: "business", question: { ar: "هل تجد نفسك بارعاً في إقناع زملائك بفكرة معينة؟", en: "Do you find yourself skilled at convincing peers of a certain idea?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "نادراً", en: "Rarely" }], correctIndex: 0, explanation: { ar: "مهارة الإقناع أساسية في مجال الأعمال والتسويق", en: "Persuasion skills are fundamental in business and marketing" } },
+    { id: "b11", type: "interest", path: "business", question: { ar: "هل تهتم بمتابعة أخبار الشركات العالمية وأسعار العملات؟", en: "Are you interested in following global company news and currency rates?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "قليلاً", en: "A little" }], correctIndex: 0, explanation: { ar: "متابعة أخبار الأعمال تدل على ميول في مجال إدارة الأعمال", en: "Following business news indicates business path inclination" } },
+    { id: "b12", type: "interest", path: "business", question: { ar: "هل تفضل العمل المكتبي القيادي على العمل الميداني؟", en: "Do you prefer office leadership work over field work?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "كلاهما", en: "Both" }], correctIndex: 0, explanation: { ar: "تفضيل العمل القيادي يتناسب مع مسار إدارة الأعمال", en: "Preferring leadership work fits the business administration path" } },
+    { id: "b13", type: "interest", path: "business", question: { ar: "هل تستمتع بحساب الأرقام والنسب المئوية والأرباح؟", en: "Do you enjoy calculating numbers, percentages, and profits?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "أحياناً", en: "Sometimes" }], correctIndex: 0, explanation: { ar: "حب الأرقام والحسابات أساسي في المحاسبة والأعمال", en: "Loving numbers and calculations is fundamental in accounting and business" } },
+    { id: "b14", type: "interest", path: "business", question: { ar: "هل تحب العمل في بيئة تتطلب التفاوض والبيع والشراء؟", en: "Do you like working in environments requiring negotiation, buying, and selling?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "ربما", en: "Maybe" }], correctIndex: 0, explanation: { ar: "التفاوض والبيع من المهارات الأساسية في مجال الأعمال", en: "Negotiation and sales are core business skills" } },
   ],
   shariah: [
-    {
-      id: "s1", type: "theory",
-      question: { ar: "ما هي أركان الإسلام الخمسة؟ أيها الركن الثالث؟", en: "What are the five pillars of Islam? Which is the third?" },
-      options: [
-        { ar: "الصلاة", en: "Prayer (Salah)" },
-        { ar: "الزكاة", en: "Almsgiving (Zakat)" },
-        { ar: "الصوم", en: "Fasting (Sawm)" },
-        { ar: "الحج", en: "Pilgrimage (Hajj)" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "الزكاة هي الركن الثالث من أركان الإسلام بعد الشهادتين والصلاة", en: "Zakat is the third pillar of Islam, after Shahada and Salah" },
-    },
-    {
-      id: "s2", type: "simulation",
-      question: { ar: "شخص يسأل عن حكم بيع سلعة لم يستلمها بعد. ما الحكم الشرعي؟", en: "Someone asks about selling goods they haven't received yet. What's the ruling?" },
-      options: [
-        { ar: "جائز مطلقاً", en: "Permissible in all cases" },
-        { ar: "لا يجوز بيع ما لم يُقبض إلا في حالات مستثناة", en: "Not permissible to sell what hasn't been received, with some exceptions" },
-        { ar: "مكروه فقط", en: "Only disliked (makruh)" },
-        { ar: "لا علاقة للشريعة بالتجارة", en: "Shari'ah doesn't deal with trade" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "نهى النبي ﷺ عن بيع ما لم يُقبض لما فيه من الغرر", en: "The Prophet ﷺ prohibited selling what hasn't been received due to uncertainty (gharar)" },
-    },
-    {
-      id: "s3", type: "theory",
-      question: { ar: "ما هو المصدر الثاني للتشريع الإسلامي بعد القرآن الكريم؟", en: "What is the second source of Islamic legislation after the Quran?" },
-      options: [
-        { ar: "الإجماع", en: "Consensus (Ijma)" },
-        { ar: "السنة النبوية", en: "Prophetic Sunnah" },
-        { ar: "القياس", en: "Analogy (Qiyas)" },
-        { ar: "العرف", en: "Custom (Urf)" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "السنة النبوية هي المصدر الثاني للتشريع بعد القرآن الكريم", en: "The Prophetic Sunnah is the second source after the Holy Quran" },
-    },
-    {
-      id: "s4", type: "simulation",
-      question: { ar: "خلاف بين شريكين في مشروع تجاري حول توزيع الأرباح. كيف تحكم؟", en: "Two partners dispute profit distribution. How do you rule?" },
-      options: [
-        { ar: "يأخذ الأقوى نصيباً أكبر", en: "The stronger partner gets more" },
-        { ar: "الأرباح حسب الاتفاق، والخسارة حسب رأس المال", en: "Profits per agreement, losses per capital ratio" },
-        { ar: "تقسيم متساوٍ دائماً", en: "Always equal split" },
-        { ar: "لا حل شرعي لهذه المسألة", en: "No Shari'ah solution exists" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "في الشركة الإسلامية: الربح حسب الاتفاق والخسارة بقدر رأس المال", en: "In Islamic partnership: profit by agreement, loss by capital proportion" },
-    },
-    {
-      id: "s5", type: "theory",
-      question: { ar: "ما معنى 'الاجتهاد' في أصول الفقه؟", en: "What does 'Ijtihad' mean in Islamic jurisprudence?" },
-      options: [
-        { ar: "التقليد الأعمى", en: "Blind imitation" },
-        { ar: "بذل الجهد في استنباط الأحكام الشرعية من الأدلة", en: "Exerting effort to derive rulings from evidence" },
-        { ar: "رفض السنة", en: "Rejecting the Sunnah" },
-        { ar: "الاكتفاء بالقرآن فقط", en: "Relying only on the Quran" },
-      ],
-      correctIndex: 1,
-      explanation: { ar: "الاجتهاد هو بذل الوسع في استنباط الحكم الشرعي من أدلته التفصيلية", en: "Ijtihad is exerting effort to derive Islamic rulings from detailed evidence" },
-    },
+    // Scientific (8)
+    { id: "sh1", type: "theory", path: "shariah", question: { ar: "القواعد الفقهية: أي منها تعني أن الأصل في الأشياء الطهارة حتى يثبت العكس؟", en: "Which legal maxim means things are presumed pure until proven otherwise?" }, options: [{ ar: "اليقين لا يزول بالشك", en: "Certainty is not overruled by doubt" }, { ar: "المشقة تجلب التيسير", en: "Hardship brings ease" }, { ar: "الضرر يزال", en: "Harm must be eliminated" }], correctIndex: 0, explanation: { ar: "قاعدة 'اليقين لا يزول بالشك' تعني أن الأصل بقاء ما كان على ما كان", en: "This maxim means the original state remains until proven otherwise" } },
+    { id: "sh2", type: "theory", path: "shariah", question: { ar: "ما هو السند في علم الحديث؟", en: "What is the 'Sanad' in Hadith science?" }, options: [{ ar: "متن الحديث", en: "Text of the Hadith" }, { ar: "سلسلة الرواة الموصلة للمتن", en: "Chain of narrators leading to the text" }, { ar: "شرح الحديث", en: "Explanation of the Hadith" }], correctIndex: 1, explanation: { ar: "السند هو سلسلة الرواة الذين نقلوا الحديث من مصدره", en: "Sanad is the chain of narrators who transmitted the Hadith" } },
+    { id: "sh3", type: "theory", path: "shariah", question: { ar: "أي من التالي يعتبر من المصادر \"التبعية\" للتشريع الإسلامي؟", en: "Which is considered a 'secondary' source of Islamic legislation?" }, options: [{ ar: "القرآن الكريم", en: "The Holy Quran" }, { ar: "السنة النبوية", en: "Prophetic Sunnah" }, { ar: "القياس", en: "Analogy (Qiyas)" }], correctIndex: 2, explanation: { ar: "القياس مصدر تبعي بعد القرآن والسنة والإجماع", en: "Qiyas is a secondary source after Quran, Sunnah, and Ijma" } },
+    { id: "sh4", type: "theory", path: "shariah", question: { ar: "نظام الحكم في المملكة العربية السعودية يستمد سلطته من:", en: "Saudi Arabia's governance derives its authority from:" }, options: [{ ar: "الأنظمة الدولية", en: "International systems" }, { ar: "كتاب الله وسنة رسوله", en: "The Book of Allah and Sunnah" }, { ar: "الأعراف القبلية", en: "Tribal customs" }], correctIndex: 1, explanation: { ar: "نظام الحكم السعودي يقوم على الشريعة الإسلامية", en: "Saudi governance is based on Islamic Shari'ah" } },
+    { id: "sh5", type: "theory", path: "shariah", question: { ar: "ما هو الفرق بين \"القضاء\" و \"الفتوى\"؟", en: "What is the difference between 'judiciary' and 'fatwa'?" }, options: [{ ar: "القضاء ملزم والفتوى غير ملزمة", en: "Judiciary is binding, fatwa is not" }, { ar: "الفتوى ملزمة والقضاء لا", en: "Fatwa is binding, judiciary is not" }, { ar: "كلاهما غير ملزم", en: "Neither is binding" }], correctIndex: 0, explanation: { ar: "القضاء حكم ملزم من القاضي، أما الفتوى فهي رأي شرعي غير ملزم", en: "Judiciary is a binding ruling; fatwa is a non-binding scholarly opinion" } },
+    { id: "sh6", type: "theory", path: "shariah", question: { ar: "الورثة الذين لهم نصيب مقدر في الشرع يسمون:", en: "Heirs with a fixed share in Shari'ah are called:" }, options: [{ ar: "العصبة", en: "Agnates (Asabah)" }, { ar: "أصحاب الفروض", en: "Fixed-share heirs (Ashab al-Furud)" }, { ar: "ذوي الأرحام", en: "Relatives (Dhawu al-Arham)" }], correctIndex: 1, explanation: { ar: "أصحاب الفروض لهم أنصبة محددة شرعاً كالنصف والربع", en: "Ashab al-Furud have fixed shares like half or quarter" } },
+    { id: "sh7", type: "theory", path: "shariah", question: { ar: "\"التعزير\" في الشريعة الإسلامية هو عقوبة:", en: "'Ta'zir' in Islamic Shari'ah is a punishment that is:" }, options: [{ ar: "مقدرة شرعاً", en: "Fixed by Shari'ah" }, { ar: "يترك تقديرها للقاضي", en: "Left to the judge's discretion" }, { ar: "لا عقوبة فيها", en: "No punishment" }], correctIndex: 1, explanation: { ar: "التعزير عقوبة غير مقدرة يقدرها القاضي حسب الجريمة والظروف", en: "Ta'zir is a discretionary punishment determined by the judge" } },
+    { id: "sh8", type: "theory", path: "shariah", question: { ar: "الجهة المسؤولة عن توثيق العقود والوكالات في المملكة هي:", en: "The authority responsible for documenting contracts in Saudi Arabia is:" }, options: [{ ar: "وزارة الصحة", en: "Ministry of Health" }, { ar: "كتابة العدل", en: "Notary Public" }, { ar: "هيئة الرياضة", en: "Sports Authority" }], correctIndex: 1, explanation: { ar: "كتابة العدل هي الجهة المختصة بتوثيق العقود والوكالات", en: "The Notary Public is responsible for documenting contracts and powers of attorney" } },
+    // Interest (6)
+    { id: "sh9", type: "interest", path: "shariah", question: { ar: "هل تستمتع بقراءة الكتب التاريخية والبحث في أصول القوانين؟", en: "Do you enjoy reading historical books and researching the origins of laws?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "حب التاريخ والقوانين يتوافق مع المسار الشرعي", en: "Love of history and law aligns with the Shari'ah path" } },
+    { id: "sh10", type: "interest", path: "shariah", question: { ar: "هل تجد لديك القدرة على التحدث أمام الجمهور وإقناعهم بالحجج والبراهين؟", en: "Do you have the ability to speak publicly and convince with arguments?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "القدرة على الإقناع والخطابة مهمة في المجال الشرعي والقانوني", en: "Public speaking and persuasion are important in Shari'ah and law" } },
+    { id: "sh11", type: "interest", path: "shariah", question: { ar: "هل تميل إلى تحليل النصوص الأدبية والشرعية واستخراج الأحكام منها؟", en: "Do you tend to analyze literary and religious texts and extract rulings?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "تحليل النصوص واستنباط الأحكام من صميم الدراسات الشرعية", en: "Text analysis and ruling extraction are core Shari'ah studies" } },
+    { id: "sh12", type: "interest", path: "shariah", question: { ar: "هل تشعر بالشغف عند الدفاع عن حقوق الآخرين وتحقيق العدالة؟", en: "Do you feel passionate about defending others' rights and achieving justice?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "أحياناً", en: "Sometimes" }, { ar: "لا", en: "No" }], correctIndex: 0, explanation: { ar: "الشغف بالعدالة والحقوق أساس في المسار الشرعي والقانوني", en: "Passion for justice is fundamental in Shari'ah and law" } },
+    { id: "sh13", type: "interest", path: "shariah", question: { ar: "هل تفضل دراسة المواد النظرية (لغة عربية، دراسات إسلامية) على المواد العلمية (فيزياء، كيمياء)؟", en: "Do you prefer theoretical subjects (Arabic, Islamic studies) over scientific ones (physics, chemistry)?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "كلاهما", en: "Both" }], correctIndex: 0, explanation: { ar: "تفضيل المواد النظرية يتوافق مع المسار الشرعي", en: "Preferring theoretical subjects aligns with the Shari'ah path" } },
+    { id: "sh14", type: "interest", path: "shariah", question: { ar: "هل لديك اهتمام بمتابعة القضايا الحقوقية والمحاكمات العالمية والمحلية؟", en: "Are you interested in following legal cases and trials locally and globally?" }, options: [{ ar: "نعم", en: "Yes" }, { ar: "لا", en: "No" }, { ar: "أحياناً", en: "Sometimes" }], correctIndex: 0, explanation: { ar: "متابعة القضايا القانونية تدل على ميول شرعية وقانونية", en: "Following legal cases indicates Shari'ah and legal inclination" } },
   ],
 };
+
+// Helper to get random questions for the general exam
+export function getGeneralExamQuestions(count: number = 40): Question[] {
+  const allQuestions: Question[] = [];
+  Object.values(questions).forEach((pathQuestions) => {
+    allQuestions.push(...pathQuestions);
+  });
+  
+  // Shuffle and pick
+  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}

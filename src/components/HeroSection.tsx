@@ -56,7 +56,7 @@ const HeroSection: React.FC = () => {
             <Button
               size="lg"
               className="rounded-full px-8 text-base gradient-gold text-accent-foreground hover:opacity-90 border-0"
-              onClick={() => document.getElementById("paths")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => navigate("/general-exam")}
             >
               {t.hero.cta}
             </Button>
