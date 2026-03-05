@@ -96,7 +96,6 @@ const GeneralExamPage: React.FC = () => {
   const isOpenEnded = current?.type === "open";
 
   const handleSelect = (optionIndex: number) => {
-    if (answers[current.id] !== undefined) return;
     const timeTaken = Math.round((Date.now() - questionStartTime) / 1000);
     setAnswers((prev) => ({ ...prev, [current.id]: optionIndex }));
     setQuestionTimestamps((prev) => ({ ...prev, [current.id]: timeTaken }));
@@ -331,14 +330,13 @@ const GeneralExamPage: React.FC = () => {
               <div className="space-y-3">
                 {current.options.map((option, idx) => {
                   let optionStyle = "border-border bg-card hover:border-primary/50";
-                  if (answers[current.id] !== undefined && answers[current.id] === idx) {
+                  if (answers[current.id] === idx) {
                     optionStyle = "border-primary bg-primary/10";
                   }
                   return (
                     <button
                       key={idx}
                       onClick={() => handleSelect(idx)}
-                      disabled={answers[current.id] !== undefined}
                       className={`w-full text-start p-4 rounded-xl border-2 transition-all ${optionStyle}`}
                     >
                       <div className="flex items-center gap-3">

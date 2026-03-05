@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import Header from "@/components/Header";
@@ -13,6 +13,10 @@ const CareerPathPage: React.FC = () => {
   const { path } = useParams<{ path: string }>();
   const navigate = useNavigate();
   const { locale } = useLanguage();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [path]);
 
   if (!path || !validPaths.includes(path as any)) {
     return (
