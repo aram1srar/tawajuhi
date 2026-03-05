@@ -261,6 +261,13 @@ const GeneralExamPage: React.FC = () => {
     shariah: { ar: "الشريعة", en: "Shari'ah" },
   };
 
+  const typeLabels: Record<string, { ar: string; en: string }> = {
+    theory: { ar: "نظري", en: "Theory" },
+    interest: { ar: "تفضيل", en: "Preference" },
+    practical: { ar: "عملي", en: "Practical" },
+    open: { ar: "مفتوح", en: "Open-ended" },
+  };
+
   const answered = isOpenEnded 
     ? (openAnswers[current.id] || "").trim().length > 10
     : answers[current.id] !== undefined;
@@ -278,6 +285,9 @@ const GeneralExamPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
                 {pathLabels[current.path]?.[locale] || current.path}
+              </span>
+              <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                {typeLabels[current.type]?.[locale] || current.type}
               </span>
               <span className="text-sm font-medium text-foreground">
                 {currentIndex + 1}/{examQuestions.length}

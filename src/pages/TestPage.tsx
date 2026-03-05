@@ -42,6 +42,13 @@ const TestPage: React.FC = () => {
     shariah: { ar: "الشريعة", en: "Shari'ah" },
   };
 
+  const typeLabels: Record<string, { ar: string; en: string }> = {
+    theory: { ar: "نظري", en: "Theory" },
+    interest: { ar: "تفضيل", en: "Preference" },
+    practical: { ar: "عملي", en: "Practical" },
+    open: { ar: "مفتوح", en: "Open-ended" },
+  };
+
   const handleSelect = (optionIndex: number) => {
     setAnswers((prev) => ({ ...prev, [current.id]: optionIndex }));
   };
@@ -116,8 +123,11 @@ const TestPage: React.FC = () => {
             </div>
           </div>
           <Progress value={progress} className="h-2" />
-          <p className="text-xs text-muted-foreground mt-2">
-            {pathNames[path || ""]?.[locale] || path}
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
+            <span>{pathNames[path || ""]?.[locale] || path}</span>
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+              {typeLabels[current?.type]?.[locale] || current?.type}
+            </span>
           </p>
         </div>
       </div>
