@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import { motion } from "framer-motion";
-import { Trophy, Clock, ArrowRight, TrendingUp, Target, BarChart3 } from "lucide-react";
+import { Trophy, Clock, TrendingUp, Target, BarChart3, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TestResult {
@@ -17,6 +17,7 @@ interface TestResult {
   duration_seconds: number | null;
   feedback: string | null;
   created_at: string;
+  recommended_paths: string[] | null;
 }
 
 const pathNames: Record<string, { ar: string; en: string; color: string }> = {
@@ -24,6 +25,7 @@ const pathNames: Record<string, { ar: string; en: string; color: string }> = {
   cs: { ar: "علوم الحاسب والهندسة", en: "Computer Science & Engineering", color: "bg-cs/10 text-cs border-cs/30" },
   business: { ar: "إدارة الأعمال", en: "Business Administration", color: "bg-business/10 text-business border-business/30" },
   shariah: { ar: "الشريعة والدراسات الإسلامية", en: "Shari'ah & Islamic Studies", color: "bg-shariah/10 text-shariah border-shariah/30" },
+  general: { ar: "الاختبار العام", en: "General Exam", color: "bg-primary/10 text-primary border-primary/30" },
 };
 
 const formatDuration = (seconds: number | null, locale: string) => {
@@ -40,6 +42,8 @@ const MyResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [results, setResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [aiReport, setAiReport] = useState<string | null>(null);
+  const [aiReportLoading, setAiReportLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -49,27 +53,60 @@ const MyResultsPage: React.FC = () => {
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      setResults((data as TestResult[]) || []);
+      const results = (data as TestResult[]) || [];
+      setResults(results);
       setLoading(false);
+
+      // Generate AI report if we have results
+      if (results.length > 0) {
+        setAiReportLoading(true);
+        try {
+          const { data: reportData } = await supabase.functions.invoke("analyze-strengths", {
+            body: {
+              results: results.map(r => ({
+                career_path: r.career_path,
+                theory_score: r.theory_score,
+                simulation_score: r.simulation_score,
+                total_score: r.total_score,
+                duration_seconds: r.duration_seconds,
+                recommended_paths: r.recommended_paths,
+                created_at: r.created_at,
+              })),
+              locale,
+            },
+          });
+          if (reportData?.report) setAiReport(reportData.report);
+        } catch (err) {
+          console.error("Strengths report error:", err);
+        } finally {
+          setAiReportLoading(false);
+        }
+      }
     };
     fetchResults();
   }, [user]);
 
-  // Best pathway: highest average score per path
+  // Calculate top 2 pathways based on all exam results
   const pathAverages = results.reduce<Record<string, { total: number; count: number }>>((acc, r) => {
-    if (!acc[r.career_path]) acc[r.career_path] = { total: 0, count: 0 };
-    acc[r.career_path].total += r.total_score;
-    acc[r.career_path].count += 1;
+    // For general exams, use recommended_paths
+    if (r.career_path === "general" && r.recommended_paths?.length) {
+      r.recommended_paths.forEach(p => {
+        if (!acc[p]) acc[p] = { total: 0, count: 0 };
+        acc[p].total += r.total_score;
+        acc[p].count += 1;
+      });
+    } else if (r.career_path !== "general") {
+      if (!acc[r.career_path]) acc[r.career_path] = { total: 0, count: 0 };
+      acc[r.career_path].total += r.total_score;
+      acc[r.career_path].count += 1;
+    }
     return acc;
   }, {});
 
   const sortedPaths = Object.entries(pathAverages)
     .map(([path, { total, count }]) => ({ path, avg: Math.round(total / count), count }))
-    .sort((a, b) => b.avg - a.avg);
-
-  // Strengths analysis
-  const theoryAvg = results.length ? Math.round(results.reduce((s, r) => s + r.theory_score, 0) / results.length) : 0;
-  const simAvg = results.length ? Math.round(results.reduce((s, r) => s + r.simulation_score, 0) / results.length) : 0;
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 2); // Top 2 only
 
   if (loading) {
     return (
@@ -99,13 +136,13 @@ const MyResultsPage: React.FC = () => {
           <div className="text-center py-20">
             <BarChart3 className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground mb-4">{locale === "ar" ? "لم تجرِ أي اختبار بعد" : "You haven't taken any tests yet"}</p>
-            <Button onClick={() => navigate("/dashboard")} className="rounded-full">
+            <Button onClick={() => navigate("/general-exam")} className="rounded-full">
               {locale === "ar" ? "ابدأ اختبارك الأول" : "Take Your First Test"}
             </Button>
           </div>
         ) : (
           <>
-            {/* Best Pathway */}
+            {/* Best Fit - Top 2 Pathways */}
             {sortedPaths.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                 className="bg-card rounded-2xl border border-border shadow-card p-8 mb-8"
@@ -113,7 +150,7 @@ const MyResultsPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-6">
                   <Trophy className="w-6 h-6 text-accent" />
                   <h2 className="text-xl font-bold text-foreground">
-                    {locale === "ar" ? "المسار الأنسب لك" : "Your Best Fit"}
+                    {locale === "ar" ? "المسارات الأنسب لك" : "Your Best Fit Pathways"}
                   </h2>
                 </div>
                 <div className="space-y-4">
@@ -127,12 +164,14 @@ const MyResultsPage: React.FC = () => {
                           {pathNames[sp.path]?.[locale] || sp.path}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {locale === "ar" ? `${sp.count} اختبار` : `${sp.count} test${sp.count > 1 ? "s" : ""}`}
+                          {locale === "ar"
+                            ? `بناءً على ${sp.count} اختبار`
+                            : `Based on ${sp.count} test${sp.count > 1 ? "s" : ""}`}
                         </p>
                       </div>
                       <div className="text-end">
                         <span className={`text-2xl font-bold ${idx === 0 ? "text-accent" : "text-foreground"}`}>{sp.avg}%</span>
-                        <p className="text-xs text-muted-foreground">{locale === "ar" ? "معدل" : "avg"}</p>
+                        <p className="text-xs text-muted-foreground">{locale === "ar" ? "ملاءمة" : "match"}</p>
                       </div>
                     </div>
                   ))}
@@ -140,40 +179,44 @@ const MyResultsPage: React.FC = () => {
               </motion.div>
             )}
 
-            {/* Strengths Analysis */}
+            {/* AI Strengths Analysis */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
               className="bg-card rounded-2xl border border-border shadow-card p-8 mb-8"
             >
               <div className="flex items-center gap-2 mb-6">
-                <TrendingUp className="w-6 h-6 text-primary" />
+                <Sparkles className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-foreground">
                   {locale === "ar" ? "تحليل نقاط القوة" : "Strengths Analysis"}
                 </h2>
               </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-muted rounded-xl p-6 text-center">
-                  <Target className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-foreground">{theoryAvg}%</p>
-                  <p className="text-sm text-muted-foreground mt-1">{locale === "ar" ? "المعرفة النظرية" : "Theory Knowledge"}</p>
+              {aiReportLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground py-4">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">{locale === "ar" ? "جاري تحليل نقاط قوتك..." : "Analyzing your strengths..."}</span>
                 </div>
-                <div className="bg-muted rounded-xl p-6 text-center">
-                  <TrendingUp className="w-8 h-8 text-accent mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-foreground">{simAvg}%</p>
-                  <p className="text-sm text-muted-foreground mt-1">{locale === "ar" ? "المهارات العملية" : "Practical Skills"}</p>
+              ) : aiReport ? (
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{aiReport}</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="bg-muted rounded-xl p-6 text-center">
+                    <Target className="w-8 h-8 text-primary mx-auto mb-3" />
+                    <p className="text-3xl font-bold text-foreground">
+                      {results.length ? Math.round(results.reduce((s, r) => s + r.theory_score, 0) / results.length) : 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{locale === "ar" ? "المعرفة النظرية" : "Theory Knowledge"}</p>
+                  </div>
+                  <div className="bg-muted rounded-xl p-6 text-center">
+                    <TrendingUp className="w-8 h-8 text-accent mx-auto mb-3" />
+                    <p className="text-3xl font-bold text-foreground">
+                      {results.length ? Math.round(results.reduce((s, r) => s + r.simulation_score, 0) / results.length) : 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{locale === "ar" ? "المهارات العملية" : "Practical Skills"}</p>
+                  </div>
                 </div>
-              </div>
-              <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
-                {theoryAvg >= simAvg
-                  ? (locale === "ar"
-                    ? "لديك قوة في الجانب النظري. ننصحك بالتركيز على تطوير مهاراتك العملية من خلال المزيد من تمارين المحاكاة."
-                    : "You're stronger in theory. We recommend focusing on developing practical skills through more simulation exercises.")
-                  : (locale === "ar"
-                    ? "لديك قوة في الجانب العملي. ننصحك بتعزيز معرفتك النظرية لتحقيق توازن أفضل في أدائك."
-                    : "You're stronger in practical skills. We recommend strengthening your theoretical knowledge for better balance.")}
-              </p>
+              )}
             </motion.div>
 
-            {/* Test History */}
+            {/* Test History - show scores not exam names */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
               className="bg-card rounded-2xl border border-border shadow-card p-8"
             >

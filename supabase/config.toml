@@ -1,1 +1,7 @@
 project_id = "rllqdjdsrehlqxwbtacg"
+
+[functions.analyze-exam]
+verify_jwt = false
+
+[functions.analyze-strengths]
+verify_jwt = false
