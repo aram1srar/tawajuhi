@@ -368,8 +368,8 @@ export function getPathwayExamQuestions(path: string, count: number = 18): Quest
     ...pickRandom(practical, perType),
   ];
 
-  // Shuffle the combined selection
-  return selected.sort(() => Math.random() - 0.5);
+  // Group by type: theory first, then interest, then practical (no shuffle)
+  return selected;
 }
 
 // Get all open-ended questions for a pathway
@@ -413,9 +413,13 @@ export function getGeneralExamQuestions(count: number = 38): Question[] {
     selected.push(...pathSelected.slice(0, n));
   });
 
-  // Add preference questions
-  selected.push(...pickRandom(preferenceQuestions, prefCount));
+  // Add preference questions to interest group
+  const prefQs = pickRandom(preferenceQuestions, prefCount);
 
-  // Shuffle everything
-  return selected.sort(() => Math.random() - 0.5);
+  // Group by type: theory first, then interest (+ preference), then practical
+  const theoryGroup = selected.filter(q => q.type === "theory");
+  const interestGroup = [...selected.filter(q => q.type === "interest"), ...prefQs];
+  const practicalGroup = selected.filter(q => q.type === "practical");
+
+  return [...theoryGroup, ...interestGroup, ...practicalGroup];
 }
