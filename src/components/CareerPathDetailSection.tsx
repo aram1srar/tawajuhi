@@ -156,7 +156,7 @@ const CareerPathDetailSection: React.FC<CareerPathDetailSectionProps> = ({ pathK
             </div>
             <h3 className="text-lg font-bold text-card-foreground mb-3">{labels.tryTest}</h3>
             <Button
-              onClick={() => navigate(`/test/${pathKey}`)}
+              onClick={() => navigate(pathKey === "general" ? "/general-exam" : `/test/${pathKey}`)}
               className={`rounded-full ${colors.solid} text-primary-foreground hover:opacity-90 transition-opacity`}
             >
               {labels.tryTest}

@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { questions } from "@/data/questions";
+import { getPathwayExamQuestions, getOpenEndedQuestions, Question } from "@/data/questions";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 const TestPage: React.FC = () => {
@@ -15,14 +16,24 @@ const TestPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const pathQuestions = useMemo(() => questions[path || ""] || [], [path]);
+  // Get 18 MCQ + 2 open-ended from this path
+  const mcqQuestions = useMemo(() => getPathwayExamQuestions(path || "", 18), [path]);
+  const openQuestions = useMemo(() => {
+    const pool = getOpenEndedQuestions(path || "");
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 2);
+  }, [path]);
+  const pathQuestions = useMemo(() => [...mcqQuestions, ...openQuestions], [mcqQuestions, openQuestions]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [openAnswers, setOpenAnswers] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [startTime] = useState(() => Date.now());
 
   const current = pathQuestions[currentIndex];
   const progress = (currentIndex / pathQuestions.length) * 100;
+  const isOpenEnded = current?.type === "open";
 
   const pathNames: Record<string, { ar: string; en: string }> = {
     health: { ar: "العلوم الصحية", en: "Health Sciences" },
@@ -42,7 +53,8 @@ const TestPage: React.FC = () => {
     } else {
       let theoryCorrect = 0, interestCorrect = 0, theoryTotal = 0, interestTotal = 0;
       pathQuestions.forEach((q) => {
-        if (q.type === "theory") {
+        if (q.type === "open") return;
+        if (q.type === "theory" || q.type === "practical") {
           theoryTotal++;
           if (answers[q.id] === q.correctIndex) theoryCorrect++;
         } else {
@@ -53,7 +65,7 @@ const TestPage: React.FC = () => {
 
       const theoryScore = theoryTotal > 0 ? Math.round((theoryCorrect / theoryTotal) * 100) : 0;
       const simScore = interestTotal > 0 ? Math.round((interestCorrect / interestTotal) * 100) : 0;
-      const totalScore = Math.round(((theoryCorrect + interestCorrect) / pathQuestions.length) * 100);
+      const totalScore = Math.round(((theoryCorrect + interestCorrect) / (theoryTotal + interestTotal)) * 100);
       const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
       if (user) {
@@ -64,7 +76,7 @@ const TestPage: React.FC = () => {
           theory_score: theoryScore,
           simulation_score: simScore,
           total_score: totalScore,
-          answers: answers as any,
+          answers: { ...answers, openAnswers } as any,
           recommended_paths: totalScore >= 60 ? [path || ""] : [],
           duration_seconds: durationSeconds,
         });
@@ -72,7 +84,7 @@ const TestPage: React.FC = () => {
       }
 
       navigate(`/results/${path}`, {
-        state: { theoryScore, simScore, totalScore, answers, questions: pathQuestions },
+        state: { theoryScore, simScore, totalScore, answers, openAnswers, questions: pathQuestions },
       });
     }
   };
@@ -85,14 +97,16 @@ const TestPage: React.FC = () => {
     );
   }
 
-  const answered = answers[current.id] !== undefined;
+  const answered = isOpenEnded
+    ? (openAnswers[current.id] || "").trim().length > 10
+    : answers[current.id] !== undefined;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
-            <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <button onClick={() => navigate("/")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4" />
               {locale === "ar" ? "رجوع" : "Back"}
             </button>
@@ -118,34 +132,57 @@ const TestPage: React.FC = () => {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Job context */}
+            {current.jobContext && (
+              <div className="bg-muted/50 border border-border rounded-xl p-4 mb-6">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {current.jobContext[locale]}
+                </p>
+              </div>
+            )}
+
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-8 leading-relaxed">
               {current.question[locale]}
             </h2>
 
-            <div className="space-y-3">
-              {current.options.map((option, idx) => {
-                let optionStyle = "border-border bg-card hover:border-primary/50";
-                if (answered && answers[current.id] === idx) {
-                  optionStyle = "border-primary bg-primary/10";
-                }
-
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => handleSelect(idx)}
-                    disabled={answered}
-                    className={`w-full text-start p-4 rounded-xl border-2 transition-all ${optionStyle}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground shrink-0">
-                        {String.fromCharCode(65 + idx)}
-                      </span>
-                      <span className="text-foreground font-medium">{option[locale]}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {isOpenEnded ? (
+              <div className="space-y-3">
+                <Textarea
+                  value={openAnswers[current.id] || ""}
+                  onChange={(e) => setOpenAnswers(prev => ({ ...prev, [current.id]: e.target.value }))}
+                  placeholder={locale === "ar" ? "اكتب إجابتك هنا..." : "Write your answer here..."}
+                  className="min-h-[150px] text-base leading-relaxed"
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {locale === "ar" ? "اكتب 10 أحرف على الأقل للمتابعة" : "Write at least 10 characters to continue"}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {current.options.map((option, idx) => {
+                  let optionStyle = "border-border bg-card hover:border-primary/50";
+                  if (answers[current.id] !== undefined && answers[current.id] === idx) {
+                    optionStyle = "border-primary bg-primary/10";
+                  }
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleSelect(idx)}
+                      disabled={answers[current.id] !== undefined}
+                      className={`w-full text-start p-4 rounded-xl border-2 transition-all ${optionStyle}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground shrink-0">
+                          {String.fromCharCode(65 + idx)}
+                        </span>
+                        <span className="text-foreground font-medium">{option[locale]}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {answered && (
               <div className="mt-8 flex justify-end">
