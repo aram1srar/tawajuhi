@@ -13,7 +13,7 @@ const ResetPasswordPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [hasSession, setHasSession] = useState(false);
+  const [isRecovery, setIsRecovery] = useState(false);
   const { locale } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,8 +27,7 @@ const ResetPasswordPage: React.FC = () => {
     success: "تم تحديث كلمة المرور بنجاح",
     error: "خطأ",
     back: "الرئيسية",
-    noSession: "يرجى التحقق من الرمز أولاً",
-    minLength: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    invalidLink: "رابط غير صالح أو منتهي الصلاحية",
   } : {
     title: "Reset Password",
     newPassword: "New Password",
@@ -38,27 +37,21 @@ const ResetPasswordPage: React.FC = () => {
     success: "Password updated successfully",
     error: "Error",
     back: "Home",
-    noSession: "Please verify your code first",
-    minLength: "Password must be at least 6 characters",
+    invalidLink: "Invalid or expired reset link",
   };
 
   useEffect(() => {
-    // Check if user has an active recovery session (from OTP verification or magic link)
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setHasSession(true);
-      } else {
-        // Listen for recovery event from magic link
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-          if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-            setHasSession(true);
-          }
-        });
-        return () => subscription.unsubscribe();
-      }
-    };
-    checkSession();
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    if (hashParams.get("type") === "recovery") {
+      setIsRecovery(true);
+    } else {
+      // Also check for recovery session
+      supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setIsRecovery(true);
+        }
+      });
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,7 +61,7 @@ const ResetPasswordPage: React.FC = () => {
       return;
     }
     if (password.length < 6) {
-      toast({ title: labels.error, description: labels.minLength, variant: "destructive" });
+      toast({ title: labels.error, description: locale === "ar" ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل" : "Password must be at least 6 characters", variant: "destructive" });
       return;
     }
 
@@ -77,7 +70,7 @@ const ResetPasswordPage: React.FC = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       toast({ title: labels.success });
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard");
     } catch (err: any) {
       toast({ title: labels.error, description: err.message, variant: "destructive" });
     } finally {
@@ -85,12 +78,12 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  if (!hasSession) {
+  if (!isRecovery) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="text-center max-w-md">
-          <p className="text-muted-foreground mb-4">{labels.noSession}</p>
-          <Button onClick={() => navigate("/forgot-password")}>{labels.back}</Button>
+          <p className="text-muted-foreground mb-4">{labels.invalidLink}</p>
+          <Button onClick={() => navigate("/auth")}>{labels.back}</Button>
         </div>
       </div>
     );
@@ -111,8 +104,20 @@ const ResetPasswordPage: React.FC = () => {
             <Label htmlFor="new-password">{labels.newPassword}</Label>
             <div className="relative">
               <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input id="new-password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="ps-10 pe-10" minLength={6} required />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+              <Input
+                id="new-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="ps-10 pe-10"
+                minLength={6}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -122,7 +127,15 @@ const ResetPasswordPage: React.FC = () => {
             <Label htmlFor="confirm-password">{labels.confirmPassword}</Label>
             <div className="relative">
               <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input id="confirm-password" type={showPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="ps-10 pe-10" minLength={6} required />
+              <Input
+                id="confirm-password"
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="ps-10 pe-10"
+                minLength={6}
+                required
+              />
             </div>
           </div>
 

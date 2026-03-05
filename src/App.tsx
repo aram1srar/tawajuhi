@@ -13,7 +13,6 @@ import ResultsPage from "./pages/ResultsPage";
 import MyResultsPage from "./pages/MyResultsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import VerifyOtpPage from "./pages/VerifyOtpPage";
 import CareerPathPage from "./pages/CareerPathPage";
 import GeneralExamPage from "./pages/GeneralExamPage";
 import NotFound from "./pages/NotFound";
@@ -40,7 +39,6 @@ const App = () => (
               <Route path="/path/:path" element={<CareerPathPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/verify-otp" element={<VerifyOtpPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/general-exam" element={<ProtectedRoute><GeneralExamPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
