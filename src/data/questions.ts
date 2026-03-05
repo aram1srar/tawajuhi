@@ -344,13 +344,32 @@ export const preferenceQuestions: Question[] = [
     options: [{ ar: "عمل يعتمد على تحليل المشكلات وتقديم استشارات دينية أو شرعية", en: "Work based on analyzing problems and providing religious advice" }, { ar: "عمل يعتمد على تشخيص وعلاج المشكلات الصحية", en: "Work based on diagnosing and treating health problems" }, { ar: "عمل قائم على القيادة والتنظيم", en: "Work based on leadership and organization" }, { ar: "عمل قائم على البرمجة وحل المشكلات التقنية", en: "Work based on programming and solving technical problems" }], correctIndex: 2, explanation: { ar: "", en: "" } },
 ];
 
-// Get questions for a specific pathway exam (20 random from pool)
-export function getPathwayExamQuestions(path: string, count: number = 20): Question[] {
+// Helper: pick N random items from array
+function pickRandom<T>(arr: T[], n: number): T[] {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(n, shuffled.length));
+}
+
+// Get questions for a specific pathway exam with equal distribution across question types
+// 20 MCQ total: equal parts from theory, interest, and practical sections
+export function getPathwayExamQuestions(path: string, count: number = 18): Question[] {
   const pathQuestions = questions[path] || [];
-  // Filter out open-ended for the random selection pool (they'll be added by AI at the end)
-  const nonOpen = pathQuestions.filter(q => q.type !== "open");
-  const shuffled = [...nonOpen].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(count, shuffled.length));
+  const theory = pathQuestions.filter(q => q.type === "theory");
+  const interest = pathQuestions.filter(q => q.type === "interest");
+  const practical = pathQuestions.filter(q => q.type === "practical");
+
+  // Equal distribution across the 3 types
+  const perType = Math.floor(count / 3);
+  const remainder = count - perType * 3;
+
+  const selected = [
+    ...pickRandom(theory, perType + (remainder > 0 ? 1 : 0)),
+    ...pickRandom(interest, perType + (remainder > 1 ? 1 : 0)),
+    ...pickRandom(practical, perType),
+  ];
+
+  // Shuffle the combined selection
+  return selected.sort(() => Math.random() - 0.5);
 }
 
 // Get all open-ended questions for a pathway
@@ -361,16 +380,42 @@ export function getOpenEndedQuestions(path?: string): Question[] {
   return Object.values(questions).flat().filter(q => q.type === "open");
 }
 
-// Helper to get random questions for the general exam (40 from all paths)
-export function getGeneralExamQuestions(count: number = 40): Question[] {
-  const allQuestions: Question[] = [];
-  Object.values(questions).forEach((pathQuestions) => {
-    // Exclude open-ended questions - those are added dynamically by AI
-    allQuestions.push(...pathQuestions.filter(q => q.type !== "open"));
+// Helper to get random questions for the general exam with equal parts from each pathway
+// 38 MCQ + 2 open-ended (added by AI) = 40 total
+// Equal parts from each of the 4 pathways, plus preference questions
+export function getGeneralExamQuestions(count: number = 38): Question[] {
+  const paths = ["cs", "health", "business", "shariah"];
+  // Reserve spots for preference questions (4 total)
+  const prefCount = Math.min(preferenceQuestions.length, 4);
+  const pathCount = count - prefCount; // questions from pathways
+  const perPath = Math.floor(pathCount / paths.length);
+  const remainder = pathCount - perPath * paths.length;
+
+  const selected: Question[] = [];
+  paths.forEach((path, i) => {
+    const pathQs = (questions[path] || []).filter(q => q.type !== "open");
+    const n = perPath + (i < remainder ? 1 : 0);
+    
+    // Within each path, try to get equal parts from theory, interest, practical
+    const theory = pathQs.filter(q => q.type === "theory");
+    const interest = pathQs.filter(q => q.type === "interest");
+    const practical = pathQs.filter(q => q.type === "practical");
+    
+    const perSubType = Math.floor(n / 3);
+    const subRemainder = n - perSubType * 3;
+    
+    const pathSelected = [
+      ...pickRandom(theory, perSubType + (subRemainder > 0 ? 1 : 0)),
+      ...pickRandom(interest, perSubType + (subRemainder > 1 ? 1 : 0)),
+      ...pickRandom(practical, perSubType),
+    ];
+    
+    selected.push(...pathSelected.slice(0, n));
   });
-  // Also add preference questions
-  allQuestions.push(...preferenceQuestions);
-  
-  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(count, shuffled.length));
+
+  // Add preference questions
+  selected.push(...pickRandom(preferenceQuestions, prefCount));
+
+  // Shuffle everything
+  return selected.sort(() => Math.random() - 0.5);
 }

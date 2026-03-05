@@ -43,7 +43,6 @@ const TestPage: React.FC = () => {
   };
 
   const handleSelect = (optionIndex: number) => {
-    if (answers[current.id] !== undefined) return;
     setAnswers((prev) => ({ ...prev, [current.id]: optionIndex }));
   };
 
@@ -162,14 +161,13 @@ const TestPage: React.FC = () => {
               <div className="space-y-3">
                 {current.options.map((option, idx) => {
                   let optionStyle = "border-border bg-card hover:border-primary/50";
-                  if (answers[current.id] !== undefined && answers[current.id] === idx) {
+                  if (answers[current.id] === idx) {
                     optionStyle = "border-primary bg-primary/10";
                   }
                   return (
                     <button
                       key={idx}
                       onClick={() => handleSelect(idx)}
-                      disabled={answers[current.id] !== undefined}
                       className={`w-full text-start p-4 rounded-xl border-2 transition-all ${optionStyle}`}
                     >
                       <div className="flex items-center gap-3">
