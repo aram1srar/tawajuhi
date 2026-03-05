@@ -105,15 +105,24 @@ const AuthPage: React.FC = () => {
     try {
       if (mode === "login") {
         const { error } = await signIn(email, password);
-        if (error) throw error;
+        if (error) {
+          // Check if email is not confirmed
+          if (error.message?.includes("Email not confirmed")) {
+            toast({
+              title: locale === "ar" ? "البريد غير مفعل" : "Email not verified",
+              description: locale === "ar" ? "يرجى تأكيد بريدك الإلكتروني أولاً" : "Please verify your email first",
+              variant: "destructive",
+            });
+            navigate(`/verify-otp?email=${encodeURIComponent(email)}&type=signup`);
+            return;
+          }
+          throw error;
+        }
         navigate("/dashboard");
       } else {
         const { error } = await signUp(email, password, username);
         if (error) throw error;
-        toast({
-          title: locale === "ar" ? "تم إنشاء الحساب" : "Account created",
-          description: locale === "ar" ? "تحقق من بريدك الإلكتروني للتفعيل" : "Check your email for verification",
-        });
+        navigate(`/verify-otp?email=${encodeURIComponent(email)}&type=signup`);
       }
     } catch (err: any) {
       toast({ title: locale === "ar" ? "خطأ" : "Error", description: err.message, variant: "destructive" });
