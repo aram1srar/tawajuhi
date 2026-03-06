@@ -102,10 +102,9 @@ const AuthPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate CAPTCHA on signup
-    if (mode === "signup" && parseInt(captchaInput) !== captcha.answer) {
+    // Validate hCaptcha on signup
+    if (mode === "signup" && !hcaptchaToken) {
       toast({ title: locale === "ar" ? "خطأ" : "Error", description: labels.captchaError, variant: "destructive" });
-      refreshCaptcha();
       return;
     }
 
