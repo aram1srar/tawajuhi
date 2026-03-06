@@ -17,7 +17,7 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
           <img src={logo} alt="Tawajohi" className="w-8 h-8 object-contain" />
           <span className="font-display font-bold text-xl text-foreground">
-            {locale === "ar" ? "توجيهي" : "Tawajohi"}
+            {locale === "ar" ? "توجُّهي" : "Tawajohi"}
           </span>
         </div>
 
