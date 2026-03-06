@@ -98,7 +98,7 @@ const translations = {
     },
     hero: {
       title: "Discover Your Career Path",
-      subtitle: "With Tawajohi",
+      subtitle: "With Tawajuhi",
       description: "An interactive platform helping Saudi high school students choose the most suitable career path through real-world simulations and AI-powered assessment",
       cta: "Start Your Journey",
       secondary: "Learn More",
@@ -166,7 +166,7 @@ const translations = {
       tryTest: "Try Path Test",
     },
     features: {
-      title: "How Tawajohi Works",
+      title: "How Tawajuhi Works",
       sim: { title: "Real Simulations", desc: "Experience practical scenarios that mirror real work environments" },
       theory: { title: "Theory Questions", desc: "Test your knowledge with diverse Saudi curriculum questions" },
       ai: { title: "AI Assessment", desc: "Get AI-powered performance analysis with personalized recommendations" },

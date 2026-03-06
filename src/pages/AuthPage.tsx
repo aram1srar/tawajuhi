@@ -76,7 +76,7 @@ const AuthPage: React.FC = () => {
     username: "Username",
     submit: mode === "login" ? "Sign In" : "Create Account",
     back: "Home",
-    welcome: "Welcome to Tawajohi",
+    welcome: "Welcome to Tawajuhi",
     subtitle: "Sign in to discover your career path",
     orContinue: "Or continue with",
     google: "Google",
@@ -179,9 +179,9 @@ const AuthPage: React.FC = () => {
 
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
-              <img src={logoImg} alt="Tawajohi" className="w-8 h-8 object-contain" />
+              <img src={logoImg} alt="Tawajuhi" className="w-8 h-8 object-contain" />
               <span className="font-display font-bold text-lg text-foreground">
-                {locale === "ar" ? "توجُّهي" : "Tawajohi"}
+                {locale === "ar" ? "توجُّهي" : "Tawajuhi"}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{labels.welcome}</h1>
@@ -338,7 +338,7 @@ const AuthPage: React.FC = () => {
       {/* Right: Visual */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-16">
         <div className="text-center max-w-md">
-          <img src={logoImg} alt="Tawajohi" className="w-24 h-24 object-contain mx-auto mb-8" />
+          <img src={logoImg} alt="Tawajuhi" className="w-24 h-24 object-contain mx-auto mb-8" />
           <h2 className="text-3xl font-bold text-primary-foreground mb-4">
             {locale === "ar" ? "اكتشف مسارك المهني" : "Discover Your Path"}
           </h2>
