@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
+import logoImg from "@/assets/logo.png";
 
 // Simple math CAPTCHA
 function generateCaptcha() {
@@ -141,7 +142,7 @@ const AuthPage: React.FC = () => {
       if (mode === "login") {
         const { error } = await signIn(email, password);
         if (error) throw error;
-        navigate("/dashboard");
+        navigate("/");
       } else {
         const { error } = await signUp(email, password, username, fullName);
         if (error) throw error;
@@ -178,9 +179,7 @@ const AuthPage: React.FC = () => {
 
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg gradient-hero flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">ت</span>
-              </div>
+              <img src={logoImg} alt="Tawajohi" className="w-8 h-8 object-contain" />
               <span className="font-display font-bold text-lg text-foreground">
                 {locale === "ar" ? "توجيهي" : "Tawajohi"}
               </span>
@@ -339,9 +338,7 @@ const AuthPage: React.FC = () => {
       {/* Right: Visual */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-16">
         <div className="text-center max-w-md">
-          <div className="w-24 h-24 rounded-3xl bg-primary-foreground/10 flex items-center justify-center mx-auto mb-8">
-            <span className="text-5xl text-primary-foreground font-bold">ت</span>
-          </div>
+          <img src={logoImg} alt="Tawajohi" className="w-24 h-24 object-contain mx-auto mb-8" />
           <h2 className="text-3xl font-bold text-primary-foreground mb-4">
             {locale === "ar" ? "اكتشف مسارك المهني" : "Discover Your Path"}
           </h2>
