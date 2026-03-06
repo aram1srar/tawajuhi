@@ -57,41 +57,47 @@ const TestPage: React.FC = () => {
     if (currentIndex < pathQuestions.length - 1) {
       setCurrentIndex((i) => i + 1);
     } else {
-      let theoryCorrect = 0, interestCorrect = 0, theoryTotal = 0, interestTotal = 0;
-      pathQuestions.forEach((q) => {
-        if (q.type === "open") return;
-        if (q.type === "theory" || q.type === "practical") {
-          theoryTotal++;
-          if (answers[q.id] === q.correctIndex) theoryCorrect++;
-        } else {
-          interestTotal++;
-          if (answers[q.id] === q.correctIndex) interestCorrect++;
-        }
-      });
-
-      const theoryScore = theoryTotal > 0 ? Math.round((theoryCorrect / theoryTotal) * 100) : 0;
-      const simScore = interestTotal > 0 ? Math.round((interestCorrect / interestTotal) * 100) : 0;
-      const totalScore = Math.round(((theoryCorrect + interestCorrect) / (theoryTotal + interestTotal)) * 100);
       const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
       if (user) {
         setSaving(true);
-        await supabase.from("test_results").insert({
-          user_id: user.id,
-          career_path: path || "",
-          theory_score: theoryScore,
-          simulation_score: simScore,
-          total_score: totalScore,
-          answers: { ...answers, openAnswers } as any,
-          recommended_paths: totalScore >= 60 ? [path || ""] : [],
-          duration_seconds: durationSeconds,
-        });
-        setSaving(false);
-      }
+        try {
+          const { data, error } = await supabase.functions.invoke("submit-exam", {
+            body: {
+              answers,
+              openAnswers,
+              careerPath: path || "",
+              examType: "pathway",
+              durationSeconds,
+            },
+          });
 
-      navigate(`/results/${path}`, {
-        state: { theoryScore, simScore, totalScore, answers, openAnswers, questions: pathQuestions },
-      });
+          setSaving(false);
+
+          if (error) {
+            console.error("Submit error:", error);
+            return;
+          }
+
+          navigate(`/results/${path}`, {
+            state: {
+              theoryScore: data.theoryScore,
+              simScore: data.simScore,
+              totalScore: data.totalScore,
+              answers,
+              openAnswers,
+              questions: pathQuestions,
+            },
+          });
+        } catch (err) {
+          console.error("Submit error:", err);
+          setSaving(false);
+        }
+      } else {
+        navigate(`/results/${path}`, {
+          state: { theoryScore: 0, simScore: 0, totalScore: 0, answers, openAnswers, questions: pathQuestions },
+        });
+      }
     }
   };
 
