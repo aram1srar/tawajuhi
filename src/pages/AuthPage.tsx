@@ -14,12 +14,7 @@ import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
 import logoImg from "@/assets/logo-new.png";
 
-// Simple math CAPTCHA
-function generateCaptcha() {
-  const a = Math.floor(Math.random() * 10) + 1;
-  const b = Math.floor(Math.random() * 10) + 1;
-  return { question: `${a} + ${b}`, answer: a + b };
-}
+const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || "a454f292-79ba-429e-98ac-401823442df6";
 
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
