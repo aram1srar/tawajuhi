@@ -60,7 +60,7 @@ const AuthPage: React.FC = () => {
     username: "اسم المستخدم",
     submit: mode === "login" ? "دخول" : "إنشاء",
     back: "الرئيسية",
-    welcome: "مرحباً بك في توجيهي",
+    welcome: "مرحباً بك في توجُّهي",
     subtitle: "سجل الدخول لاكتشاف مسارك المهني",
     orContinue: "أو تابع باستخدام",
     google: "Google",
