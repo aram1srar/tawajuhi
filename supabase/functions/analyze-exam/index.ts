@@ -83,8 +83,8 @@ serve(async (req) => {
         model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: isArabic
-            ? `أنت مستشار مهني متخصص لطلاب الثانوية في السعودية. بناءً على نتائج الاختبار والإجابات المفتوحة، قدم توصية مهنية دقيقة مع تصنيف المسارات حسب التوافق. ركز على تحليل البيانات الكمية والنوعية لتقديم أفضل توصية.`
-            : `You are a specialized career advisor for Saudi high school students. Based on exam results and open-ended answers, provide precise career recommendations with path compatibility rankings. Focus on analyzing both quantitative and qualitative data for the best recommendation.`
+            ? `أنت مستشار مهني متخصص لطلاب الثانوية في السعودية. بناءً على نتائج الاختبار والإجابات المفتوحة، قدم توصية مهنية دقيقة مع تصنيف المسارات حسب التوافق. ركز على تحليل البيانات الكمية والنوعية لتقديم أفضل توصية. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+            : `You are a specialized career advisor for Saudi high school students. Based on exam results and open-ended answers, provide precise career recommendations with path compatibility rankings. Focus on analyzing both quantitative and qualitative data for the best recommendation. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`
           },
           { role: "user", content: baseContext + (isArabic ? "\n\nقدم توصية مهنية دقيقة وتصنيف المسارات." : "\n\nProvide precise career recommendation and path rankings.") },
         ],
@@ -128,8 +128,8 @@ serve(async (req) => {
         model: "openai/gpt-5",
         messages: [
           { role: "system", content: isArabic
-            ? `أنت محلل أداء تعليمي متخصص. حلل أداء الطالب بدقة وحدد نقاط القوة والضعف وأسلوب التفكير. قدم نصائح عملية للتحسين بناءً على أخطائه وأنماط إجاباته.`
-            : `You are a specialized educational performance analyst. Analyze student performance precisely, identify strengths, weaknesses, and thinking style. Provide actionable improvement advice based on their errors and answer patterns.`
+            ? `أنت محلل أداء تعليمي متخصص. حلل أداء الطالب بدقة وحدد نقاط القوة والضعف وأسلوب التفكير. قدم نصائح عملية للتحسين بناءً على أخطائه وأنماط إجاباته. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+            : `You are a specialized educational performance analyst. Analyze student performance precisely, identify strengths, weaknesses, and thinking style. Provide actionable improvement advice based on their errors and answer patterns. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`
           },
           { role: "user", content: baseContext + (isArabic ? "\n\nحلل الأداء وحدد نقاط القوة والضعف وأسلوب التفكير." : "\n\nAnalyze performance, identify strengths, weaknesses, and thinking style.") },
         ],
@@ -185,8 +185,8 @@ serve(async (req) => {
         model: "google/gemini-3-pro-preview",
         messages: [
           { role: "system", content: isArabic
-            ? `أنت نظام تصنيف مهني ذكي. بناءً على جميع البيانات المتاحة (إجابات نظرية، عملية، مفتوحة، أوقات الإجابة)، صنّف الطالب في المسار الأنسب مع تحليل معمق لأسباب التصنيف.`
-            : `You are a smart career classification system. Based on all available data (theory, practical, open-ended answers, response times), classify the student into the best-fit path with deep analysis of classification reasons.`
+            ? `أنت نظام تصنيف مهني ذكي. بناءً على جميع البيانات المتاحة (إجابات نظرية، عملية، مفتوحة، أوقات الإجابة)، صنّف الطالب في المسار الأنسب مع تحليل معمق لأسباب التصنيف. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+            : `You are a smart career classification system. Based on all available data (theory, practical, open-ended answers, response times), classify the student into the best-fit path with deep analysis of classification reasons. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`
           },
           { role: "user", content: baseContext + (isArabic ? "\n\nصنّف الطالب وقدم تحليلاً معمقاً." : "\n\nClassify the student and provide deep analysis.") },
         ],
