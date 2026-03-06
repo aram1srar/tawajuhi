@@ -11,6 +11,13 @@ import {
 } from "recharts";
 import type { Question } from "@/data/questions";
 
+interface ClassificationData {
+  primaryPath: string;
+  confidence: number;
+  classificationReasoning: string;
+  cognitiveProfile: string;
+}
+
 interface StructuredAnalysis {
   recommendation: string;
   strengths: { area: string; description: string }[];
@@ -18,6 +25,7 @@ interface StructuredAnalysis {
   thinkingStyle: string;
   simulationInsight: string;
   careerFit: { path: string; fitScore: number; reason: string }[];
+  classification?: ClassificationData;
 }
 
 interface OpenEndedAnalysis {
