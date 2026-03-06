@@ -292,6 +292,24 @@ const ResultsPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* AI Classification */}
+                {aiAnalysis.classification && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+                    <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-primary" />
+                      {locale === "ar" ? "التصنيف الذكي" : "AI Classification"}
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                        {aiAnalysis.classification.confidence}% {locale === "ar" ? "ثقة" : "confidence"}
+                      </span>
+                    </h3>
+                    <p className="text-sm text-foreground font-medium mb-1">
+                      {pathNames[aiAnalysis.classification.primaryPath]?.[locale] || aiAnalysis.classification.primaryPath}
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-2">{aiAnalysis.classification.classificationReasoning}</p>
+                    <p className="text-xs text-muted-foreground italic">{aiAnalysis.classification.cognitiveProfile}</p>
+                  </div>
+                )}
+
                 {/* Thinking Style & Simulation Insight */}
                 <div className="grid md:grid-cols-2 gap-4 pt-2">
                   <div className="bg-muted/50 rounded-xl p-4">
