@@ -10,7 +10,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Auth verification
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -32,7 +31,7 @@ serve(async (req) => {
       });
     }
 
-    const { pathScores, answers, questions, questionTimestamps, durationSeconds, locale } = await req.json();
+    const { pathScores, answers, questions, questionTimestamps, durationSeconds, locale, openAnswers, openEndedAnalysis } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -47,13 +46,36 @@ serve(async (req) => {
 
     const isArabic = locale === "ar";
 
+    // Build open-ended context
+    let openEndedContext = "";
+    if (openAnswers && typeof openAnswers === "object" && Object.keys(openAnswers).length > 0) {
+      const entries = Object.entries(openAnswers as Record<string, string>);
+      openEndedContext = entries.map(([qId, ans]) => `[${qId}]: "${ans}"`).join("\n");
+    }
+
+    let aiAnalysisContext = "";
+    if (openEndedAnalysis) {
+      if (openEndedAnalysis.detectedSkills?.length) {
+        aiAnalysisContext += "\nDetected skills from writing: " + 
+          openEndedAnalysis.detectedSkills.map((s: any) => `${s.skill} (${s.confidence}%)`).join(", ");
+      }
+      if (openEndedAnalysis.writingQuality) {
+        const wq = openEndedAnalysis.writingQuality;
+        aiAnalysisContext += `\nWriting quality: clarity=${wq.clarity}%, depth=${wq.depth}%, creativity=${wq.creativity}%, problemSolving=${wq.problemSolving}%`;
+      }
+      if (openEndedAnalysis.careerAffinity?.length) {
+        aiAnalysisContext += "\nCareer affinity from writing: " +
+          openEndedAnalysis.careerAffinity.map((c: any) => `${c.path}: ${c.score}%`).join(", ");
+      }
+    }
+
     const systemPrompt = isArabic
-      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. حلل نتائج الاختبار وقدم توصية شخصية قصيرة (3-4 جمل فقط). اذكر المسار الأنسب ونقاط القوة. كن مشجعاً وواقعياً. لا تذكر الدرجات الرقمية.`
-      : `You are a smart career advisor for Saudi high school students. Analyze the exam results and give a short personalized recommendation (3-4 sentences only). Mention the best-suited path and strengths. Be encouraging and realistic. Don't mention numeric scores.`;
+      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. حلل نتائج الاختبار بما فيها الإجابات المفتوحة وقدم تحليلاً شاملاً باستخدام أداة التحليل المنظمة. قيّم أداء الطالب في الأسئلة النظرية والعملية والمفتوحة. حلل طريقة تفكير الطالب ومدى شغفه بالمجال. قدم توصيات مفصلة.`
+      : `You are a smart career advisor for Saudi high school students. Analyze the complete exam results including open-ended answers and provide comprehensive analysis using the structured tool. Evaluate performance across theory, practical simulations, and open-ended responses. Analyze the student's thinking pattern and passion for the field. Give detailed recommendations.`;
 
     const userPrompt = isArabic
-      ? `نتائج الطالب في الاختبار العام:\n${pathSummary}\nمتوسط وقت الإجابة: ${Math.round(avgTimePerQuestion)} ثانية لكل سؤال\nإجمالي الوقت: ${Math.round(durationSeconds / 60)} دقيقة\n\nالمسارات: cs=علوم الحاسب، health=الصحة والحياة، business=إدارة الأعمال، shariah=الشريعة\n\nقدم تحليلاً شخصياً قصيراً.`
-      : `Student results on the general exam:\n${pathSummary}\nAverage response time: ${Math.round(avgTimePerQuestion)}s per question\nTotal time: ${Math.round(durationSeconds / 60)} minutes\n\nPaths: cs=Computer Science, health=Health & Life, business=Business, shariah=Shari'ah\n\nGive a short personalized analysis.`;
+      ? `نتائج الطالب:\n${pathSummary}\nمتوسط وقت الإجابة: ${Math.round(avgTimePerQuestion)} ثانية\nإجمالي الوقت: ${Math.round(durationSeconds / 60)} دقيقة${openEndedContext ? `\n\nالإجابات المفتوحة:\n${openEndedContext}` : ""}${aiAnalysisContext ? `\n\nتحليل الكتابة:\n${aiAnalysisContext}` : ""}\n\nالمسارات: cs=علوم الحاسب، health=الصحة، business=إدارة الأعمال، shariah=الشريعة\n\nقدم تحليلاً منظماً شاملاً.`
+      : `Student results:\n${pathSummary}\nAvg response time: ${Math.round(avgTimePerQuestion)}s\nTotal time: ${Math.round(durationSeconds / 60)} min${openEndedContext ? `\n\nOpen-ended answers:\n${openEndedContext}` : ""}${aiAnalysisContext ? `\n\nWriting analysis:\n${aiAnalysisContext}` : ""}\n\nPaths: cs=Computer Science, health=Health, business=Business, shariah=Shari'ah\n\nProvide comprehensive structured analysis.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -62,22 +84,89 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "openai/gpt-5-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "provide_exam_analysis",
+            description: "Provide comprehensive exam analysis with career recommendations, skill assessment, and feedback",
+            parameters: {
+              type: "object",
+              properties: {
+                recommendation: {
+                  type: "string",
+                  description: "3-4 sentence personalized career recommendation mentioning the best path and why",
+                },
+                strengths: {
+                  type: "array",
+                  description: "3-5 key strengths identified from all question types",
+                  items: {
+                    type: "object",
+                    properties: {
+                      area: { type: "string", description: "Strength area name" },
+                      description: { type: "string", description: "Brief description of this strength" },
+                    },
+                    required: ["area", "description"],
+                    additionalProperties: false,
+                  },
+                },
+                improvements: {
+                  type: "array",
+                  description: "2-3 areas for improvement with actionable advice",
+                  items: {
+                    type: "object",
+                    properties: {
+                      area: { type: "string", description: "Area needing improvement" },
+                      advice: { type: "string", description: "Specific actionable advice" },
+                    },
+                    required: ["area", "advice"],
+                    additionalProperties: false,
+                  },
+                },
+                thinkingStyle: {
+                  type: "string",
+                  description: "1-2 sentences describing the student's thinking/problem-solving style based on their answers",
+                },
+                simulationInsight: {
+                  type: "string",
+                  description: "1-2 sentences about how the student handled practical/simulation questions",
+                },
+                careerFit: {
+                  type: "array",
+                  description: "Career paths ranked by fit",
+                  items: {
+                    type: "object",
+                    properties: {
+                      path: { type: "string", enum: ["cs", "health", "business", "shariah"] },
+                      fitScore: { type: "number", description: "Fit score 0-100" },
+                      reason: { type: "string", description: "Why this path fits or doesn't" },
+                    },
+                    required: ["path", "fitScore", "reason"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["recommendation", "strengths", "improvements", "thinkingStyle", "simulationInsight", "careerFit"],
+              additionalProperties: false,
+            },
+          },
+        }],
+        tool_choice: { type: "function", function: { name: "provide_exam_analysis" } },
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), {
+        return new Response(JSON.stringify({ error: "Rate limited" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required." }), {
+        return new Response(JSON.stringify({ error: "Payment required" }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -87,9 +176,18 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const analysis = data.choices?.[0]?.message?.content || "";
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
-    return new Response(JSON.stringify({ analysis }), {
+    if (toolCall?.function?.arguments) {
+      const analysis = JSON.parse(toolCall.function.arguments);
+      return new Response(JSON.stringify({ analysis, structured: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Fallback to text
+    const analysis = data.choices?.[0]?.message?.content || "";
+    return new Response(JSON.stringify({ analysis, structured: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
