@@ -31,7 +31,12 @@ serve(async (req) => {
       });
     }
 
-    const { careerPath, locale, studentContext } = await req.json();
+    const { careerPath, locale, studentContext: rawStudentContext } = await req.json();
+
+    // Sanitize studentContext: truncate to 500 chars
+    const studentContext = rawStudentContext && typeof rawStudentContext === "string"
+      ? rawStudentContext.slice(0, 500)
+      : undefined;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
