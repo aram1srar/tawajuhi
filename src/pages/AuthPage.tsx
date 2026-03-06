@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -6,19 +6,15 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
 import logoImg from "@/assets/logo-new.png";
 
-// Simple math CAPTCHA
-function generateCaptcha() {
-  const a = Math.floor(Math.random() * 10) + 1;
-  const b = Math.floor(Math.random() * 10) + 1;
-  return { question: `${a} + ${b}`, answer: a + b };
-}
+const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || "a454f292-79ba-429e-98ac-401823442df6";
 
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -29,21 +25,26 @@ const AuthPage: React.FC = () => {
   
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [captcha, setCaptcha] = useState(generateCaptcha);
-  const [captchaInput, setCaptchaInput] = useState("");
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const hcaptchaRef = useRef<HCaptcha>(null);
   const { signIn, signUp, user: currentUser } = useAuth();
   const { locale, setLocale } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const refreshCaptcha = useCallback(() => {
-    setCaptcha(generateCaptcha());
-    setCaptchaInput("");
+  const onHCaptchaVerify = useCallback((token: string) => {
+    setHcaptchaToken(token);
   }, []);
 
+  const onHCaptchaExpire = useCallback(() => {
+    setHcaptchaToken(null);
+  }, []);
+
+  // Reset captcha when switching modes
   useEffect(() => {
-    refreshCaptcha();
-  }, [mode, refreshCaptcha]);
+    setHcaptchaToken(null);
+    hcaptchaRef.current?.resetCaptcha();
+  }, [mode]);
 
   // Redirect if already logged in (e.g. after Google OAuth)
   useEffect(() => {
@@ -66,8 +67,7 @@ const AuthPage: React.FC = () => {
     google: "Google",
     fullName: "الاسم الكامل",
     
-    captchaLabel: "أثبت أنك إنسان",
-    captchaError: "الإجابة غير صحيحة",
+    captchaError: "يرجى إكمال التحقق",
   } : {
     login: "Login",
     signup: "Sign Up",
@@ -82,8 +82,7 @@ const AuthPage: React.FC = () => {
     google: "Google",
     fullName: "Full Name",
     
-    captchaLabel: "Prove you're human",
-    captchaError: "Incorrect answer",
+    captchaError: "Please complete the captcha",
   };
 
   const handleGoogleSignIn = async () => {
@@ -103,10 +102,9 @@ const AuthPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate CAPTCHA on signup
-    if (mode === "signup" && parseInt(captchaInput) !== captcha.answer) {
+    // Validate hCaptcha on signup
+    if (mode === "signup" && !hcaptchaToken) {
       toast({ title: locale === "ar" ? "خطأ" : "Error", description: labels.captchaError, variant: "destructive" });
-      refreshCaptcha();
       return;
     }
 
@@ -295,29 +293,20 @@ const AuthPage: React.FC = () => {
                 )}
               </div>
 
-              {/* CAPTCHA on signup */}
+              {/* hCaptcha on signup */}
               {mode === "signup" && (
-                <div className="space-y-2">
-                  <Label>{labels.captchaLabel}</Label>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border">
-                    <span className="font-mono text-lg font-bold text-foreground select-none">
-                      {captcha.question} = ?
-                    </span>
-                    <Input
-                      type="number"
-                      value={captchaInput}
-                      onChange={(e) => setCaptchaInput(e.target.value)}
-                      className="w-20 text-center"
-                      required
-                    />
-                    <button type="button" onClick={refreshCaptcha} className="text-muted-foreground hover:text-foreground transition-colors">
-                      <RefreshCw className="w-4 h-4" />
-                    </button>
-                  </div>
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={hcaptchaRef}
+                    sitekey={HCAPTCHA_SITE_KEY}
+                    onVerify={onHCaptchaVerify}
+                    onExpire={onHCaptchaExpire}
+                    languageOverride={locale === "ar" ? "ar" : "en"}
+                  />
                 </div>
               )}
 
-              <Button type="submit" className="w-full rounded-lg" disabled={loading}>
+              <Button type="submit" className="w-full rounded-lg" disabled={loading || (mode === "signup" && !hcaptchaToken)}>
                 {loading ? "..." : labels.submit}
               </Button>
 
