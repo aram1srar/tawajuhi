@@ -128,6 +128,7 @@ const GeneralExamPage: React.FC = () => {
               examType: "general",
               durationSeconds,
               questionTimestamps,
+              locale,
             },
           });
 
@@ -148,6 +149,7 @@ const GeneralExamPage: React.FC = () => {
               questions: examQuestions,
               questionTimestamps,
               durationSeconds: data.durationSeconds,
+              openEndedAnalysis: data.openEndedAnalysis || null,
             },
           });
         } catch (err) {

@@ -69,6 +69,7 @@ const TestPage: React.FC = () => {
               careerPath: path || "",
               examType: "pathway",
               durationSeconds,
+              locale,
             },
           });
 
@@ -87,6 +88,7 @@ const TestPage: React.FC = () => {
               answers,
               openAnswers,
               questions: pathQuestions,
+              openEndedAnalysis: data.openEndedAnalysis || null,
             },
           });
         } catch (err) {
