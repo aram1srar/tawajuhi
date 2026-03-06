@@ -88,6 +88,7 @@ const TestPage: React.FC = () => {
               answers,
               openAnswers,
               questions: pathQuestions,
+              openEndedAnalysis: data.openEndedAnalysis || null,
             },
           });
         } catch (err) {
