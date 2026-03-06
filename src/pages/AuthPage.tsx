@@ -67,8 +67,7 @@ const AuthPage: React.FC = () => {
     google: "Google",
     fullName: "الاسم الكامل",
     
-    captchaLabel: "أثبت أنك إنسان",
-    captchaError: "الإجابة غير صحيحة",
+    captchaError: "يرجى إكمال التحقق",
   } : {
     login: "Login",
     signup: "Sign Up",
