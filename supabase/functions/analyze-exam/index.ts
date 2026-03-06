@@ -83,8 +83,8 @@ serve(async (req) => {
         model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: isArabic
-            ? `أنت مستشار مهني متخصص لطلاب الثانوية في السعودية. بناءً على نتائج الاختبار والإجابات المفتوحة، قدم توصية مهنية دقيقة مع تصنيف المسارات حسب التوافق. ركز على تحليل البيانات الكمية والنوعية لتقديم أفضل توصية.`
-            : `You are a specialized career advisor for Saudi high school students. Based on exam results and open-ended answers, provide precise career recommendations with path compatibility rankings. Focus on analyzing both quantitative and qualitative data for the best recommendation.`
+            ? `أنت مستشار مهني متخصص لطلاب الثانوية في السعودية. بناءً على نتائج الاختبار والإجابات المفتوحة، قدم توصية مهنية دقيقة مع تصنيف المسارات حسب التوافق. ركز على تحليل البيانات الكمية والنوعية لتقديم أفضل توصية. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+            : `You are a specialized career advisor for Saudi high school students. Based on exam results and open-ended answers, provide precise career recommendations with path compatibility rankings. Focus on analyzing both quantitative and qualitative data for the best recommendation. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`
           },
           { role: "user", content: baseContext + (isArabic ? "\n\nقدم توصية مهنية دقيقة وتصنيف المسارات." : "\n\nProvide precise career recommendation and path rankings.") },
         ],
