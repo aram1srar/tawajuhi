@@ -69,75 +69,36 @@ serve(async (req) => {
       }
     }
 
-    const systemPrompt = isArabic
-      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. حلل نتائج الاختبار بما فيها الإجابات المفتوحة وقدم تحليلاً شاملاً باستخدام أداة التحليل المنظمة. قيّم أداء الطالب في الأسئلة النظرية والعملية والمفتوحة. حلل طريقة تفكير الطالب ومدى شغفه بالمجال. قدم توصيات مفصلة.`
-      : `You are a smart career advisor for Saudi high school students. Analyze the complete exam results including open-ended answers and provide comprehensive analysis using the structured tool. Evaluate performance across theory, practical simulations, and open-ended responses. Analyze the student's thinking pattern and passion for the field. Give detailed recommendations.`;
+    const baseContext = isArabic
+      ? `نتائج الطالب:\n${pathSummary}\nمتوسط وقت الإجابة: ${Math.round(avgTimePerQuestion)} ثانية\nإجمالي الوقت: ${Math.round(durationSeconds / 60)} دقيقة${openEndedContext ? `\n\nالإجابات المفتوحة:\n${openEndedContext}` : ""}${aiAnalysisContext ? `\n\nتحليل الكتابة:\n${aiAnalysisContext}` : ""}\n\nالمسارات: cs=علوم الحاسب، health=الصحة، business=إدارة الأعمال، shariah=الشريعة`
+      : `Student results:\n${pathSummary}\nAvg response time: ${Math.round(avgTimePerQuestion)}s\nTotal time: ${Math.round(durationSeconds / 60)} min${openEndedContext ? `\n\nOpen-ended answers:\n${openEndedContext}` : ""}${aiAnalysisContext ? `\n\nWriting analysis:\n${aiAnalysisContext}` : ""}\n\nPaths: cs=Computer Science, health=Health, business=Business, shariah=Shari'ah`;
 
-    const userPrompt = isArabic
-      ? `نتائج الطالب:\n${pathSummary}\nمتوسط وقت الإجابة: ${Math.round(avgTimePerQuestion)} ثانية\nإجمالي الوقت: ${Math.round(durationSeconds / 60)} دقيقة${openEndedContext ? `\n\nالإجابات المفتوحة:\n${openEndedContext}` : ""}${aiAnalysisContext ? `\n\nتحليل الكتابة:\n${aiAnalysisContext}` : ""}\n\nالمسارات: cs=علوم الحاسب، health=الصحة، business=إدارة الأعمال، shariah=الشريعة\n\nقدم تحليلاً منظماً شاملاً.`
-      : `Student results:\n${pathSummary}\nAvg response time: ${Math.round(avgTimePerQuestion)}s\nTotal time: ${Math.round(durationSeconds / 60)} min${openEndedContext ? `\n\nOpen-ended answers:\n${openEndedContext}` : ""}${aiAnalysisContext ? `\n\nWriting analysis:\n${aiAnalysisContext}` : ""}\n\nPaths: cs=Computer Science, health=Health, business=Business, shariah=Shari'ah\n\nProvide comprehensive structured analysis.`;
+    // === PARALLEL AI CALLS with specialized models ===
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // 1. Career Recommendations (google/gemini-2.5-pro)
+    const careerRecommendationPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "openai/gpt-5-mini",
+        model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          { role: "system", content: isArabic
+            ? `أنت مستشار مهني متخصص لطلاب الثانوية في السعودية. بناءً على نتائج الاختبار والإجابات المفتوحة، قدم توصية مهنية دقيقة مع تصنيف المسارات حسب التوافق. ركز على تحليل البيانات الكمية والنوعية لتقديم أفضل توصية.`
+            : `You are a specialized career advisor for Saudi high school students. Based on exam results and open-ended answers, provide precise career recommendations with path compatibility rankings. Focus on analyzing both quantitative and qualitative data for the best recommendation.`
+          },
+          { role: "user", content: baseContext + (isArabic ? "\n\nقدم توصية مهنية دقيقة وتصنيف المسارات." : "\n\nProvide precise career recommendation and path rankings.") },
         ],
         tools: [{
           type: "function",
           function: {
-            name: "provide_exam_analysis",
-            description: "Provide comprehensive exam analysis with career recommendations, skill assessment, and feedback",
+            name: "provide_career_recommendation",
+            description: "Provide career path recommendation with compatibility scores",
             parameters: {
               type: "object",
               properties: {
-                recommendation: {
-                  type: "string",
-                  description: "3-4 sentence personalized career recommendation mentioning the best path and why",
-                },
-                strengths: {
-                  type: "array",
-                  description: "3-5 key strengths identified from all question types",
-                  items: {
-                    type: "object",
-                    properties: {
-                      area: { type: "string", description: "Strength area name" },
-                      description: { type: "string", description: "Brief description of this strength" },
-                    },
-                    required: ["area", "description"],
-                    additionalProperties: false,
-                  },
-                },
-                improvements: {
-                  type: "array",
-                  description: "2-3 areas for improvement with actionable advice",
-                  items: {
-                    type: "object",
-                    properties: {
-                      area: { type: "string", description: "Area needing improvement" },
-                      advice: { type: "string", description: "Specific actionable advice" },
-                    },
-                    required: ["area", "advice"],
-                    additionalProperties: false,
-                  },
-                },
-                thinkingStyle: {
-                  type: "string",
-                  description: "1-2 sentences describing the student's thinking/problem-solving style based on their answers",
-                },
-                simulationInsight: {
-                  type: "string",
-                  description: "1-2 sentences about how the student handled practical/simulation questions",
-                },
+                recommendation: { type: "string", description: "3-4 sentence personalized career recommendation" },
                 careerFit: {
                   type: "array",
-                  description: "Career paths ranked by fit",
                   items: {
                     type: "object",
                     properties: {
@@ -150,46 +111,163 @@ serve(async (req) => {
                   },
                 },
               },
-              required: ["recommendation", "strengths", "improvements", "thinkingStyle", "simulationInsight", "careerFit"],
+              required: ["recommendation", "careerFit"],
               additionalProperties: false,
             },
           },
         }],
-        tool_choice: { type: "function", function: { name: "provide_exam_analysis" } },
+        tool_choice: { type: "function", function: { name: "provide_career_recommendation" } },
       }),
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited" }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+    // 2. Performance Feedback (openai/gpt-5)
+    const performanceFeedbackPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "openai/gpt-5",
+        messages: [
+          { role: "system", content: isArabic
+            ? `أنت محلل أداء تعليمي متخصص. حلل أداء الطالب بدقة وحدد نقاط القوة والضعف وأسلوب التفكير. قدم نصائح عملية للتحسين بناءً على أخطائه وأنماط إجاباته.`
+            : `You are a specialized educational performance analyst. Analyze student performance precisely, identify strengths, weaknesses, and thinking style. Provide actionable improvement advice based on their errors and answer patterns.`
+          },
+          { role: "user", content: baseContext + (isArabic ? "\n\nحلل الأداء وحدد نقاط القوة والضعف وأسلوب التفكير." : "\n\nAnalyze performance, identify strengths, weaknesses, and thinking style.") },
+        ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "provide_performance_feedback",
+            description: "Provide detailed performance analysis with strengths, improvements, and thinking style",
+            parameters: {
+              type: "object",
+              properties: {
+                strengths: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      area: { type: "string" },
+                      description: { type: "string" },
+                    },
+                    required: ["area", "description"],
+                    additionalProperties: false,
+                  },
+                },
+                improvements: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      area: { type: "string" },
+                      advice: { type: "string" },
+                    },
+                    required: ["area", "advice"],
+                    additionalProperties: false,
+                  },
+                },
+                thinkingStyle: { type: "string", description: "1-2 sentences describing thinking/problem-solving style" },
+                simulationInsight: { type: "string", description: "1-2 sentences about practical/simulation question handling" },
+              },
+              required: ["strengths", "improvements", "thinkingStyle", "simulationInsight"],
+              additionalProperties: false,
+            },
+          },
+        }],
+        tool_choice: { type: "function", function: { name: "provide_performance_feedback" } },
+      }),
+    });
+
+    // 3. Career Classification (google/gemini-3-pro-preview)
+    const classificationPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-3-pro-preview",
+        messages: [
+          { role: "system", content: isArabic
+            ? `أنت نظام تصنيف مهني ذكي. بناءً على جميع البيانات المتاحة (إجابات نظرية، عملية، مفتوحة، أوقات الإجابة)، صنّف الطالب في المسار الأنسب مع تحليل معمق لأسباب التصنيف.`
+            : `You are a smart career classification system. Based on all available data (theory, practical, open-ended answers, response times), classify the student into the best-fit path with deep analysis of classification reasons.`
+          },
+          { role: "user", content: baseContext + (isArabic ? "\n\nصنّف الطالب وقدم تحليلاً معمقاً." : "\n\nClassify the student and provide deep analysis.") },
+        ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "classify_career",
+            description: "Classify student into career path with reasoning",
+            parameters: {
+              type: "object",
+              properties: {
+                primaryPath: { type: "string", enum: ["cs", "health", "business", "shariah"] },
+                confidence: { type: "number", description: "Classification confidence 0-100" },
+                classificationReasoning: { type: "string", description: "2-3 sentences explaining the classification" },
+                cognitiveProfile: { type: "string", description: "1-2 sentences about cognitive strengths observed" },
+              },
+              required: ["primaryPath", "confidence", "classificationReasoning", "cognitiveProfile"],
+              additionalProperties: false,
+            },
+          },
+        }],
+        tool_choice: { type: "function", function: { name: "classify_career" } },
+      }),
+    });
+
+    // Execute all 3 AI calls in parallel
+    const [careerRes, feedbackRes, classificationRes] = await Promise.all([
+      careerRecommendationPromise,
+      performanceFeedbackPromise,
+      classificationPromise,
+    ]);
+
+    // Handle rate limiting / payment errors
+    for (const [name, res] of [["career", careerRes], ["feedback", feedbackRes], ["classification", classificationRes]] as [string, Response][]) {
+      if (!res.ok) {
+        if (res.status === 429) {
+          return new Response(JSON.stringify({ error: "Rate limited" }), {
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (res.status === 402) {
+          return new Response(JSON.stringify({ error: "Payment required" }), {
+            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        console.error(`${name} AI error:`, res.status, await res.text());
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required" }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
     }
 
-    const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    // Parse all responses
+    const parseToolCall = async (res: Response) => {
+      if (!res.ok) return null;
+      try {
+        const data = await res.json();
+        const tc = data.choices?.[0]?.message?.tool_calls?.[0];
+        if (tc?.function?.arguments) return JSON.parse(tc.function.arguments);
+        return null;
+      } catch { return null; }
+    };
 
-    if (toolCall?.function?.arguments) {
-      const analysis = JSON.parse(toolCall.function.arguments);
-      return new Response(JSON.stringify({ analysis, structured: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const [careerData, feedbackData, classificationData] = await Promise.all([
+      parseToolCall(careerRes),
+      parseToolCall(feedbackRes),
+      parseToolCall(classificationRes),
+    ]);
 
-    // Fallback to text
-    const analysis = data.choices?.[0]?.message?.content || "";
-    return new Response(JSON.stringify({ analysis, structured: false }), {
+    // Merge all results into unified analysis
+    const analysis: any = {
+      recommendation: careerData?.recommendation || "",
+      careerFit: careerData?.careerFit || [],
+      strengths: feedbackData?.strengths || [],
+      improvements: feedbackData?.improvements || [],
+      thinkingStyle: feedbackData?.thinkingStyle || "",
+      simulationInsight: feedbackData?.simulationInsight || "",
+      classification: classificationData || null,
+    };
+
+    return new Response(JSON.stringify({ analysis, structured: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (e) {
     console.error("analyze-exam error:", e);
     return new Response(JSON.stringify({ error: "An internal error occurred. Please try again." }), {
