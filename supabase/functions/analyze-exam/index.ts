@@ -128,8 +128,8 @@ serve(async (req) => {
         model: "openai/gpt-5",
         messages: [
           { role: "system", content: isArabic
-            ? `أنت محلل أداء تعليمي متخصص. حلل أداء الطالب بدقة وحدد نقاط القوة والضعف وأسلوب التفكير. قدم نصائح عملية للتحسين بناءً على أخطائه وأنماط إجاباته.`
-            : `You are a specialized educational performance analyst. Analyze student performance precisely, identify strengths, weaknesses, and thinking style. Provide actionable improvement advice based on their errors and answer patterns.`
+            ? `أنت محلل أداء تعليمي متخصص. حلل أداء الطالب بدقة وحدد نقاط القوة والضعف وأسلوب التفكير. قدم نصائح عملية للتحسين بناءً على أخطائه وأنماط إجاباته. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+            : `You are a specialized educational performance analyst. Analyze student performance precisely, identify strengths, weaknesses, and thinking style. Provide actionable improvement advice based on their errors and answer patterns. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`
           },
           { role: "user", content: baseContext + (isArabic ? "\n\nحلل الأداء وحدد نقاط القوة والضعف وأسلوب التفكير." : "\n\nAnalyze performance, identify strengths, weaknesses, and thinking style.") },
         ],
