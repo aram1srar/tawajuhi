@@ -1,6 +1,6 @@
 import React from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-new.png";
 import vision2030 from "@/assets/vision2030.jpg";
 
 const Footer: React.FC = () => {

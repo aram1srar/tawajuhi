@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo-new.png";
 
 // Simple math CAPTCHA
 function generateCaptcha() {
