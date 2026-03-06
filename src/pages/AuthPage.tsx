@@ -335,16 +335,17 @@ const AuthPage: React.FC = () => {
 
       {/* Right: Visual */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-16">
-        <div className="text-center max-w-md">
-          <img src={logoImg} alt="Tawajohi" className="w-24 h-24 object-contain mx-auto mb-8" />
+        <div className="text-center max-w-md flex flex-col items-center">
+          <Logo size={96} showText={false} className="mb-8 [&_svg_circle]:stroke-primary-foreground [&_svg_line]:stroke-primary-foreground" />
           <h2 className="text-3xl font-bold text-primary-foreground mb-4">
             {locale === "ar" ? "اكتشف مسارك المهني" : "Discover Your Path"}
           </h2>
-          <p className="text-primary-foreground/60 leading-relaxed">
+          <p className="text-primary-foreground/60 leading-relaxed mb-8">
             {locale === "ar"
               ? "محاكاة واقعية وتقييم ذكي يساعدك في اختيار المسار الأنسب لمستقبلك"
               : "Real-world simulations and AI-powered assessment to help you choose the right career"}
           </p>
+          <Vision2030Badge variant="light" />
         </div>
       </div>
     </div>
