@@ -4,7 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Globe, LogOut, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-new.png";
 
 const Header: React.FC = () => {
   const { locale, setLocale, t } = useLanguage();
