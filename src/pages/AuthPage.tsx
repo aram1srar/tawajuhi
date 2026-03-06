@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -6,7 +6,8 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
