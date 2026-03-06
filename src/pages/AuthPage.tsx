@@ -293,25 +293,16 @@ const AuthPage: React.FC = () => {
                 )}
               </div>
 
-              {/* CAPTCHA on signup */}
+              {/* hCaptcha on signup */}
               {mode === "signup" && (
-                <div className="space-y-2">
-                  <Label>{labels.captchaLabel}</Label>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border">
-                    <span className="font-mono text-lg font-bold text-foreground select-none">
-                      {captcha.question} = ?
-                    </span>
-                    <Input
-                      type="number"
-                      value={captchaInput}
-                      onChange={(e) => setCaptchaInput(e.target.value)}
-                      className="w-20 text-center"
-                      required
-                    />
-                    <button type="button" onClick={refreshCaptcha} className="text-muted-foreground hover:text-foreground transition-colors">
-                      <RefreshCw className="w-4 h-4" />
-                    </button>
-                  </div>
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={hcaptchaRef}
+                    sitekey={HCAPTCHA_SITE_KEY}
+                    onVerify={onHCaptchaVerify}
+                    onExpire={onHCaptchaExpire}
+                    languageOverride={locale === "ar" ? "ar" : "en"}
+                  />
                 </div>
               )}
 
