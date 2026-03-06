@@ -128,6 +128,7 @@ const GeneralExamPage: React.FC = () => {
               examType: "general",
               durationSeconds,
               questionTimestamps,
+              locale,
             },
           });
 
