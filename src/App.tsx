@@ -7,7 +7,7 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
-import Dashboard from "./pages/Dashboard";
+
 import TestPage from "./pages/TestPage";
 import ResultsPage from "./pages/ResultsPage";
 import MyResultsPage from "./pages/MyResultsPage";
@@ -41,7 +41,7 @@ const App = () => (
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/general-exam" element={<ProtectedRoute><GeneralExamPage /></ProtectedRoute>} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<Navigate to="/" replace />} />
               <Route path="/test/:path" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
               <Route path="/results/:path" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
               <Route path="/my-results" element={<ProtectedRoute><MyResultsPage /></ProtectedRoute>} />

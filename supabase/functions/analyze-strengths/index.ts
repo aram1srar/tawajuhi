@@ -10,7 +10,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Auth verification
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -44,12 +43,12 @@ serve(async (req) => {
     }).join("\n");
 
     const systemPrompt = isArabic
-      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. قم بتحليل نتائج جميع الاختبارات التي أجراها الطالب وقدم تقريراً مفصلاً عن نقاط قوته ومهاراته. اذكر المجالات التي يتفوق فيها والمجالات التي يمكنه تحسينها. كن مشجعاً ومحدداً. اكتب 4-6 جمل. لا تذكر الدرجات الرقمية مباشرة.`
-      : `You are a smart career advisor for Saudi high school students. Analyze all the student's exam results and provide a detailed report on their strengths and skills. Mention areas they excel in and areas for improvement. Be encouraging and specific. Write 4-6 sentences. Don't mention numeric scores directly.`;
+      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. حلل نتائج الاختبارات وقدم تحليلاً مفصلاً باستخدام أداة التحليل المنظمة. قيّم المهارات من 0 إلى 100. اكتب ملخصاً مختصراً وتعليقاً تحفيزياً. اكتب بالعربية.`
+      : `You are a smart career advisor for Saudi high school students. Analyze all exam results and provide structured analysis using the tool. Rate skills 0-100. Write a short summary and encouraging feedback. Write in English.`;
 
     const userPrompt = isArabic
-      ? `نتائج جميع الاختبارات:\n${resultsSummary}\n\nالمسارات: cs=علوم الحاسب، health=الصحة والحياة، business=إدارة الأعمال، shariah=الشريعة، general=الاختبار العام\n\nقدم تقريراً مفصلاً عن نقاط القوة والمهارات.`
-      : `All exam results:\n${resultsSummary}\n\nPaths: cs=Computer Science, health=Health & Life, business=Business, shariah=Shari'ah, general=General Exam\n\nProvide a detailed strengths and skills report.`;
+      ? `نتائج الاختبارات:\n${resultsSummary}\n\nالمسارات: cs=علوم الحاسب، health=الصحة والحياة، business=إدارة الأعمال، shariah=الشريعة، general=العام\n\nقدم تحليلاً منظماً.`
+      : `Exam results:\n${resultsSummary}\n\nPaths: cs=Computer Science, health=Health & Life, business=Business, shariah=Shari'ah, general=General\n\nProvide structured analysis.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -58,11 +57,57 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "openai/gpt-5-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "provide_analysis",
+              description: "Provide structured skill analysis with scores, summary, and feedback",
+              parameters: {
+                type: "object",
+                properties: {
+                  skills: {
+                    type: "array",
+                    description: "List of 5-7 skill areas with scores",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string", description: "Skill name (in the requested language)" },
+                        score: { type: "number", description: "Score 0-100" },
+                        category: { type: "string", enum: ["strength", "average", "improve"], description: "strength if >=75, average if >=50, improve if <50" },
+                      },
+                      required: ["name", "score", "category"],
+                      additionalProperties: false,
+                    },
+                  },
+                  pathScores: {
+                    type: "array",
+                    description: "Career path compatibility scores",
+                    items: {
+                      type: "object",
+                      properties: {
+                        path: { type: "string", description: "Path key: health, cs, business, shariah" },
+                        score: { type: "number", description: "Compatibility score 0-100" },
+                      },
+                      required: ["path", "score"],
+                      additionalProperties: false,
+                    },
+                  },
+                  summary: { type: "string", description: "2-3 sentence summary of overall performance" },
+                  feedback: { type: "string", description: "2-3 sentence encouraging feedback with specific advice" },
+                },
+                required: ["skills", "pathScores", "summary", "feedback"],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "provide_analysis" } },
       }),
     });
 
@@ -83,8 +128,17 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const report = data.choices?.[0]?.message?.content || "";
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    
+    if (toolCall?.function?.arguments) {
+      const analysis = JSON.parse(toolCall.function.arguments);
+      return new Response(JSON.stringify({ analysis }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
+    // Fallback: return text report
+    const report = data.choices?.[0]?.message?.content || "";
     return new Response(JSON.stringify({ report }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
