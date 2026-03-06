@@ -82,8 +82,7 @@ const AuthPage: React.FC = () => {
     google: "Google",
     fullName: "Full Name",
     
-    captchaLabel: "Prove you're human",
-    captchaError: "Incorrect answer",
+    captchaError: "Please complete the captcha",
   };
 
   const handleGoogleSignIn = async () => {
