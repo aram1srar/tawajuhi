@@ -1,7 +1,1 @@
-project_id = "pqsboryhwkmopsurwjbs"
-
-[functions.submit-exam]
-verify_jwt = false
-
-[functions.check-password]
-verify_jwt = false
+project_id = "ubmnmpzxnjgvholpvajz"
