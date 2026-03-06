@@ -306,7 +306,7 @@ const AuthPage: React.FC = () => {
                 </div>
               )}
 
-              <Button type="submit" className="w-full rounded-lg" disabled={loading}>
+              <Button type="submit" className="w-full rounded-lg" disabled={loading || (mode === "signup" && !hcaptchaToken)}>
                 {loading ? "..." : labels.submit}
               </Button>
 
