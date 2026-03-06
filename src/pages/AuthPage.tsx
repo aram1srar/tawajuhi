@@ -25,21 +25,26 @@ const AuthPage: React.FC = () => {
   
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [captcha, setCaptcha] = useState(generateCaptcha);
-  const [captchaInput, setCaptchaInput] = useState("");
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const hcaptchaRef = useRef<HCaptcha>(null);
   const { signIn, signUp, user: currentUser } = useAuth();
   const { locale, setLocale } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const refreshCaptcha = useCallback(() => {
-    setCaptcha(generateCaptcha());
-    setCaptchaInput("");
+  const onHCaptchaVerify = useCallback((token: string) => {
+    setHcaptchaToken(token);
   }, []);
 
+  const onHCaptchaExpire = useCallback(() => {
+    setHcaptchaToken(null);
+  }, []);
+
+  // Reset captcha when switching modes
   useEffect(() => {
-    refreshCaptcha();
-  }, [mode, refreshCaptcha]);
+    setHcaptchaToken(null);
+    hcaptchaRef.current?.resetCaptcha();
+  }, [mode]);
 
   // Redirect if already logged in (e.g. after Google OAuth)
   useEffect(() => {
