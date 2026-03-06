@@ -5,7 +5,7 @@ const translations = {
     nav: {
       home: "الرئيسية",
       paths: "المسارات المهنية",
-      about: "عن توجيهي",
+      about: "عن توجُّهي",
       start: "ابدأ الاختبار",
     },
     hero: {
