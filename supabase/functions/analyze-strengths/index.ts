@@ -43,12 +43,12 @@ serve(async (req) => {
     }).join("\n");
 
     const systemPrompt = isArabic
-      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. حلل نتائج الاختبارات وقدم تحليلاً مفصلاً باستخدام أداة التحليل المنظمة. قيّم المهارات من 0 إلى 100. اكتب ملخصاً مختصراً وتعليقاً تحفيزياً. اكتب بالعربية.`
-      : `You are a smart career advisor for Saudi high school students. Analyze all exam results and provide structured analysis using the tool. Rate skills 0-100. Write a short summary and encouraging feedback. Write in English.`;
+      ? `أنت مستشار مهني ذكي لطلاب الثانوية في السعودية. حلل نتائج الاختبارات وقدم تحليلاً مفصلاً باستخدام أداة التحليل المنظمة. قيّم المهارات من 0 إلى 100. اكتب ملخصاً مختصراً وتعليقاً تحفيزياً. اكتب بالعربية. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+      : `You are a smart career advisor for Saudi high school students. Analyze all exam results and provide structured analysis using the tool. Rate skills 0-100. Write a short summary and encouraging feedback. Write in English. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`;
 
     const userPrompt = isArabic
-      ? `نتائج الاختبارات:\n${resultsSummary}\n\nالمسارات: cs=علوم الحاسب، health=الصحة والحياة، business=إدارة الأعمال، shariah=الشريعة، general=العام\n\nقدم تحليلاً منظماً.`
-      : `Exam results:\n${resultsSummary}\n\nPaths: cs=Computer Science, health=Health & Life, business=Business, shariah=Shari'ah, general=General\n\nProvide structured analysis.`;
+      ? `نتائج الاختبارات:\n${resultsSummary}\n\nالمسارات: cs=علوم الحاسب، health=الصحة والحياة، business=إدارة الأعمال، shariah=الشريعة، general=العام\n\nقدم تحليلاً منظماً. لا تذكر أي مهارات شفهية أو لفظية.`
+      : `Exam results:\n${resultsSummary}\n\nPaths: cs=Computer Science, health=Health & Life, business=Business, shariah=Shari'ah, general=General\n\nProvide structured analysis. Do not mention any verbal or oral skills.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
