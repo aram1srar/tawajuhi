@@ -338,7 +338,7 @@ const AuthPage: React.FC = () => {
       {/* Right: Visual */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-16">
         <div className="text-center max-w-md">
-          <img src={logoImg} alt="Tawajohi" className="w-24 h-24 object-contain mx-auto mb-8" />
+          <img src={logoImg} alt="Tawajuhi" className="w-24 h-24 object-contain mx-auto mb-8" />
           <h2 className="text-3xl font-bold text-primary-foreground mb-4">
             {locale === "ar" ? "اكتشف مسارك المهني" : "Discover Your Path"}
           </h2>

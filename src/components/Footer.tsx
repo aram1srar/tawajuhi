@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
           <img src={vision2030} alt="Saudi Vision 2030" className="h-12 object-contain opacity-80" />
         </div>
         <p className="text-primary-foreground/40 text-xs">
-          © 2026 Tawajohi. {t.footer.rights}
+          © 2026 Tawajuhi. {t.footer.rights}
         </p>
       </div>
     </footer>

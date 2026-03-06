@@ -166,7 +166,7 @@ const translations = {
       tryTest: "Try Path Test",
     },
     features: {
-      title: "How Tawajohi Works",
+      title: "How Tawajuhi Works",
       sim: { title: "Real Simulations", desc: "Experience practical scenarios that mirror real work environments" },
       theory: { title: "Theory Questions", desc: "Test your knowledge with diverse Saudi curriculum questions" },
       ai: { title: "AI Assessment", desc: "Get AI-powered performance analysis with personalized recommendations" },
