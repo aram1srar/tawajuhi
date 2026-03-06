@@ -115,54 +115,60 @@ const GeneralExamPage: React.FC = () => {
       setCurrentIndex((i) => i + 1);
       setQuestionStartTime(Date.now());
     } else {
-      // Calculate scores per path
-      const pathScores: Record<string, { correct: number; total: number }> = {};
-      examQuestions.forEach((q) => {
-        if (q.type === "open") return; // Don't count open-ended in scores
-        if (!pathScores[q.path]) pathScores[q.path] = { correct: 0, total: 0 };
-        pathScores[q.path].total++;
-        if (answers[q.id] === q.correctIndex) pathScores[q.path].correct++;
-      });
-
-      const totalCorrect = Object.values(pathScores).reduce((s, p) => s + p.correct, 0);
-      const totalQuestions = Object.values(pathScores).reduce((s, p) => s + p.total, 0);
-      const totalScore = Math.round((totalCorrect / totalQuestions) * 100);
       const durationSeconds = Math.round((Date.now() - startTime) / 1000);
-
-      let bestPath = "";
-      let bestPct = 0;
-      Object.entries(pathScores).forEach(([path, { correct, total }]) => {
-        const pct = total > 0 ? correct / total : 0;
-        if (pct > bestPct) { bestPct = pct; bestPath = path; }
-      });
 
       if (user) {
         setSaving(true);
-        await supabase.from("test_results").insert({
-          user_id: user.id,
-          career_path: "general",
-          theory_score: totalScore,
-          simulation_score: 0,
-          total_score: totalScore,
-          answers: { ...answers, openAnswers } as any,
-          recommended_paths: bestPath ? [bestPath] : [],
-          duration_seconds: durationSeconds,
-        });
-        setSaving(false);
-      }
+        try {
+          const { data, error } = await supabase.functions.invoke("submit-exam", {
+            body: {
+              answers,
+              openAnswers,
+              careerPath: "general",
+              examType: "general",
+              durationSeconds,
+              questionTimestamps,
+            },
+          });
 
-      navigate(`/results/general`, {
-        state: {
-          totalScore,
-          pathScores,
-          bestPath,
-          answers,
-          openAnswers,
-          questions: examQuestions,
-          questionTimestamps,
-          durationSeconds,
-        },
-      });
+          setSaving(false);
+
+          if (error) {
+            console.error("Submit error:", error);
+            return;
+          }
+
+          navigate(`/results/general`, {
+            state: {
+              totalScore: data.totalScore,
+              pathScores: data.pathScores,
+              bestPath: data.bestPath,
+              answers,
+              openAnswers,
+              questions: examQuestions,
+              questionTimestamps,
+              durationSeconds: data.durationSeconds,
+            },
+          });
+        } catch (err) {
+          console.error("Submit error:", err);
+          setSaving(false);
+        }
+      } else {
+        // Not logged in - navigate with client-side data (no save)
+        navigate(`/results/general`, {
+          state: {
+            totalScore: 0,
+            pathScores: {},
+            bestPath: "",
+            answers,
+            openAnswers,
+            questions: examQuestions,
+            questionTimestamps,
+            durationSeconds,
+          },
+        });
+      }
     }
   };
 

@@ -1,1 +1,4 @@
 project_id = "pqsboryhwkmopsurwjbs"
+
+[functions.submit-exam]
+verify_jwt = false
