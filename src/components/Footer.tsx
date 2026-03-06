@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
         <div className="flex items-center justify-center gap-2 mb-4">
           <img src={logo} alt="Tawajohi" className="w-8 h-8 object-contain" />
           <span className="font-display font-bold text-xl text-primary-foreground">
-            {locale === "ar" ? "توجيهي" : "Tawajohi"}
+            {locale === "ar" ? "توجُّهي" : "Tawajohi"}
           </span>
         </div>
         <p className="text-primary-foreground/60 text-sm mb-4">{t.footer.tagline}</p>
