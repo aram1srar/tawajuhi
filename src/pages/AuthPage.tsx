@@ -76,7 +76,7 @@ const AuthPage: React.FC = () => {
     username: "Username",
     submit: mode === "login" ? "Sign In" : "Create Account",
     back: "Home",
-    welcome: "Welcome to Tawajohi",
+    welcome: "Welcome to Tawajuhi",
     subtitle: "Sign in to discover your career path",
     orContinue: "Or continue with",
     google: "Google",
