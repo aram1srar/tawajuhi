@@ -22,6 +22,8 @@ const AuthPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [captcha, setCaptcha] = useState(generateCaptcha);
@@ -59,6 +61,8 @@ const AuthPage: React.FC = () => {
     subtitle: "سجل الدخول لاكتشاف مسارك المهني",
     orContinue: "أو تابع باستخدام",
     google: "Google",
+    fullName: "الاسم الكامل",
+    phone: "رقم الهاتف",
     captchaLabel: "أثبت أنك إنسان",
     captchaError: "الإجابة غير صحيحة",
   } : {
@@ -73,6 +77,8 @@ const AuthPage: React.FC = () => {
     subtitle: "Sign in to discover your career path",
     orContinue: "Or continue with",
     google: "Google",
+    fullName: "Full Name",
+    phone: "Phone Number",
     captchaLabel: "Prove you're human",
     captchaError: "Incorrect answer",
   };
@@ -108,7 +114,7 @@ const AuthPage: React.FC = () => {
         if (error) throw error;
         navigate("/dashboard");
       } else {
-        const { error } = await signUp(email, password, username);
+        const { error } = await signUp(email, password, username, fullName, phoneNumber);
         if (error) throw error;
         toast({
           title: locale === "ar" ? "تم إنشاء الحساب" : "Account created",
@@ -217,6 +223,25 @@ const AuthPage: React.FC = () => {
                 </div>
               )}
 
+              {mode === "signup" && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">{labels.fullName}</Label>
+                  <div className="relative">
+                    <User className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className="ps-10" required />
+                  </div>
+                </div>
+              )}
+
+              {mode === "signup" && (
+                <div className="space-y-2">
+                  <Label htmlFor="phone">{labels.phone}</Label>
+                  <div className="relative">
+                    <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input id="phone" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="ps-10" />
+                  </div>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">{labels.email}</Label>
                 <div className="relative">
