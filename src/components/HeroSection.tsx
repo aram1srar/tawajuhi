@@ -42,7 +42,7 @@ const HeroSection: React.FC = () => {
             </span>
           </motion.div>
 
-          <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground mb-4 leading-tight">
+          <h1 className="text-4xl md:text-7xl font-bold text-primary-foreground mb-4 leading-snug md:leading-tight">
             {t.hero.title}
             <br />
             <span className="text-accent">{t.hero.subtitle}</span>
