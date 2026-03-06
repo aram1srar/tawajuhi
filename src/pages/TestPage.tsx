@@ -69,6 +69,7 @@ const TestPage: React.FC = () => {
               careerPath: path || "",
               examType: "pathway",
               durationSeconds,
+              locale,
             },
           });
 
