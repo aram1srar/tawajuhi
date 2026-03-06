@@ -185,8 +185,8 @@ serve(async (req) => {
         model: "google/gemini-3-pro-preview",
         messages: [
           { role: "system", content: isArabic
-            ? `أنت نظام تصنيف مهني ذكي. بناءً على جميع البيانات المتاحة (إجابات نظرية، عملية، مفتوحة، أوقات الإجابة)، صنّف الطالب في المسار الأنسب مع تحليل معمق لأسباب التصنيف.`
-            : `You are a smart career classification system. Based on all available data (theory, practical, open-ended answers, response times), classify the student into the best-fit path with deep analysis of classification reasons.`
+            ? `أنت نظام تصنيف مهني ذكي. بناءً على جميع البيانات المتاحة (إجابات نظرية، عملية، مفتوحة، أوقات الإجابة)، صنّف الطالب في المسار الأنسب مع تحليل معمق لأسباب التصنيف. ملاحظة مهمة: لا تذكر مهارات التواصل الشفهي أو اللفظي لأن الاختبار لا يتضمن أي تقييم شفهي - اذكر فقط مهارات الكتابة والتواصل الكتابي إن وُجدت.`
+            : `You are a smart career classification system. Based on all available data (theory, practical, open-ended answers, response times), classify the student into the best-fit path with deep analysis of classification reasons. IMPORTANT: Do NOT mention verbal, oral, or spoken communication skills — this exam has no verbal component. Only reference written communication skills if relevant.`
           },
           { role: "user", content: baseContext + (isArabic ? "\n\nصنّف الطالب وقدم تحليلاً معمقاً." : "\n\nClassify the student and provide deep analysis.") },
         ],
