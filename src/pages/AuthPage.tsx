@@ -181,7 +181,7 @@ const AuthPage: React.FC = () => {
             <div className="flex items-center gap-2 mb-3">
               <img src={logoImg} alt="Tawajohi" className="w-8 h-8 object-contain" />
               <span className="font-display font-bold text-lg text-foreground">
-                {locale === "ar" ? "توجيهي" : "Tawajohi"}
+                {locale === "ar" ? "توجُّهي" : "Tawajohi"}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{labels.welcome}</h1>
