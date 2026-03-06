@@ -201,7 +201,20 @@ serve(async (req) => {
       });
     }
 
-    const { answers, openAnswers, careerPath, examType, durationSeconds, questionTimestamps, locale } = await req.json();
+    const { answers, openAnswers: rawOpenAnswers, careerPath, examType, durationSeconds, questionTimestamps, locale } = await req.json();
+
+    // Sanitize open-ended answers: truncate each to 500 chars, max 20 entries, aggregate max 5000 chars
+    let openAnswers: Record<string, string> = {};
+    if (rawOpenAnswers && typeof rawOpenAnswers === "object") {
+      let totalLength = 0;
+      const entries = Object.entries(rawOpenAnswers).slice(0, 20);
+      for (const [key, val] of entries) {
+        const sanitized = String(val).slice(0, 500);
+        totalLength += sanitized.length;
+        if (totalLength > 5000) break;
+        openAnswers[key] = sanitized;
+      }
+    }
 
     if (!answers || typeof answers !== "object") {
       return new Response(JSON.stringify({ error: "Invalid answers" }), {
