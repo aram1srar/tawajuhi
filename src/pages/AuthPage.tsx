@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
+import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
 
 // Simple math CAPTCHA
 function generateCaptcha() {
@@ -107,7 +109,34 @@ const AuthPage: React.FC = () => {
       return;
     }
 
+    // Validate password strength on signup
+    if (mode === "signup") {
+      const strength = getPasswordStrength(password);
+      if (strength.score < 5) {
+        toast({
+          title: locale === "ar" ? "خطأ" : "Error",
+          description: locale === "ar" ? "كلمة المرور لا تستوفي جميع المتطلبات" : "Password does not meet all requirements",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
+
+    // Server-side breach check on signup
+    if (mode === "signup") {
+      const serverCheck = await checkPasswordServer(password);
+      if (!serverCheck.valid) {
+        setLoading(false);
+        toast({
+          title: locale === "ar" ? "خطأ" : "Error",
+          description: serverCheck.errors[0] || (locale === "ar" ? "كلمة المرور غير آمنة" : "Password is not safe"),
+          variant: "destructive",
+        });
+        return;
+      }
+    }
     try {
       if (mode === "login") {
         const { error } = await signIn(email, password);
@@ -262,6 +291,9 @@ const AuthPage: React.FC = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {mode === "signup" && (
+                  <PasswordStrengthIndicator password={password} locale={locale as "ar" | "en"} />
+                )}
               </div>
 
               {/* CAPTCHA on signup */}

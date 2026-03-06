@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
+import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState("");
@@ -60,12 +62,27 @@ const ResetPasswordPage: React.FC = () => {
       toast({ title: labels.error, description: labels.mismatch, variant: "destructive" });
       return;
     }
-    if (password.length < 6) {
-      toast({ title: labels.error, description: locale === "ar" ? "كلمة المرور يجب أن تكون 6 أحرف على الأقل" : "Password must be at least 6 characters", variant: "destructive" });
+    
+    const strength = getPasswordStrength(password);
+    if (strength.score < 5) {
+      toast({ title: labels.error, description: locale === "ar" ? "كلمة المرور لا تستوفي جميع المتطلبات" : "Password does not meet all requirements", variant: "destructive" });
       return;
     }
 
     setLoading(true);
+
+    // Server-side breach check
+    const serverCheck = await checkPasswordServer(password);
+    if (!serverCheck.valid) {
+      setLoading(false);
+      toast({
+        title: labels.error,
+        description: serverCheck.errors[0] || (locale === "ar" ? "كلمة المرور غير آمنة" : "Password is not safe"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
@@ -121,6 +138,7 @@ const ResetPasswordPage: React.FC = () => {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            <PasswordStrengthIndicator password={password} locale={locale as "ar" | "en"} />
           </div>
 
           <div className="space-y-2">
