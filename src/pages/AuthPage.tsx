@@ -26,7 +26,7 @@ const AuthPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
-  const [userType, setUserType] = useState<"student" | "academic_staff">("student");
+  
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
