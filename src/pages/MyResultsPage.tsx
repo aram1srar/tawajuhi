@@ -168,9 +168,14 @@ const MyResultsPage: React.FC = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-5xl flex-1">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            {locale === "ar" ? "نتائجي" : "My Results"}
+          <h1 className="text-3xl font-bold text-foreground mb-1">
+            {locale === "ar"
+              ? `مرحبًا، ${user?.user_metadata?.full_name || user?.user_metadata?.username || ""}!`
+              : `Hello, ${user?.user_metadata?.full_name || user?.user_metadata?.username || ""}!`}
           </h1>
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            {locale === "ar" ? "نتائجي" : "My Results"}
+          </h2>
           <p className="text-muted-foreground mb-10">
             {locale === "ar" ? "تحليل شامل لأدائك ومسارك المهني الأنسب" : "Comprehensive analysis of your performance and best career fit"}
           </p>
@@ -245,11 +250,12 @@ const MyResultsPage: React.FC = () => {
                     </h3>
                     <div className="w-full h-[320px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
+                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="65%">
                           <PolarGrid stroke="hsl(210, 20%, 90%)" />
                           <PolarAngleAxis
                             dataKey="skill"
-                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 11 }}
+                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 10, dy: 2 }}
+                            tickFormatter={(value: string) => value.length > 12 ? value.slice(0, 12) + '…' : value}
                           />
                           <PolarRadiusAxis
                             angle={90}
