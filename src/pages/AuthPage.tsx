@@ -234,7 +234,7 @@ const AuthPage: React.FC = () => {
         toast({ title: locale === "ar" ? "خطأ" : "Error", description: usernameError, variant: "destructive" });
         return;
       }
-      const { error } = await signUp(email, password, username, fullName, userType);
+      const { error } = await signUp(email, password, username, fullName, "student");
       if (error) {
         if (error.message?.includes("already registered") || error.message?.includes("already been registered")) {
           toast({ title: locale === "ar" ? "خطأ" : "Error", description: labels.emailExists, variant: "destructive" });
