@@ -142,7 +142,7 @@ const AuthPage: React.FC = () => {
         if (error) throw error;
         navigate("/");
       } else {
-        const { error } = await signUp(email, password, username, fullName);
+        const { error } = await signUp(email, password, username, fullName, undefined, hcaptchaToken || undefined);
         if (error) throw error;
         toast({
           title: locale === "ar" ? "تم إنشاء الحساب" : "Account created",

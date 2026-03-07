@@ -46,10 +46,18 @@ serve(async (req) => {
 
     const isArabic = locale === "ar";
 
-    // Build open-ended context
+    // Build open-ended context (sanitized)
     let openEndedContext = "";
     if (openAnswers && typeof openAnswers === "object" && Object.keys(openAnswers).length > 0) {
-      const entries = Object.entries(openAnswers as Record<string, string>);
+      let sanitizedAnswers: Record<string, string> = {};
+      let totalLen = 0;
+      for (const [k, v] of Object.entries(openAnswers as Record<string, string>).slice(0, 20)) {
+        const s = String(v).slice(0, 500);
+        totalLen += s.length;
+        if (totalLen > 5000) break;
+        sanitizedAnswers[k] = s;
+      }
+      const entries = Object.entries(sanitizedAnswers);
       openEndedContext = entries.map(([qId, ans]) => `[${qId}]: "${ans}"`).join("\n");
     }
 
