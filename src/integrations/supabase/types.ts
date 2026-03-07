@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      class_students: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          student_email: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          student_email: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          student_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_students_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "staff_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -22,6 +51,7 @@ export type Database = {
           phone_number: string | null
           updated_at: string
           user_id: string
+          user_type: string
           username: string
         }
         Insert: {
@@ -31,6 +61,7 @@ export type Database = {
           phone_number?: string | null
           updated_at?: string
           user_id: string
+          user_type?: string
           username: string
         }
         Update: {
@@ -40,7 +71,29 @@ export type Database = {
           phone_number?: string | null
           updated_at?: string
           user_id?: string
+          user_type?: string
           username?: string
+        }
+        Relationships: []
+      }
+      staff_classes: {
+        Row: {
+          class_name: string
+          created_at: string
+          id: string
+          staff_user_id: string
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          id?: string
+          staff_user_id: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          id?: string
+          staff_user_id?: string
         }
         Relationships: []
       }
@@ -91,7 +144,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_student_by_email: {
+        Args: { p_email: string }
+        Returns: {
+          email: string
+          full_name: string
+          user_id: string
+          username: string
+        }[]
+      }
+      get_student_results: {
+        Args: { p_user_id: string }
+        Returns: {
+          answers: Json | null
+          career_path: string
+          created_at: string
+          duration_seconds: number | null
+          feedback: string | null
+          id: string
+          recommended_paths: string[] | null
+          simulation_score: number
+          theory_score: number
+          total_score: number
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "test_results"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      is_username_taken: { Args: { p_username: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
