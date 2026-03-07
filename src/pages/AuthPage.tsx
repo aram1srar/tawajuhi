@@ -58,19 +58,7 @@ const AuthPage: React.FC = () => {
   // Redirect after login
   useEffect(() => {
     if (currentUser) {
-      supabase
-        .from("profiles")
-        .select("user_type")
-        .eq("user_id", currentUser.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          const type = data?.user_type || "student";
-          if (type === "academic_staff") {
-            navigate("/student-results", { replace: true });
-          } else {
-            navigate("/", { replace: true });
-          }
-        });
+      navigate("/", { replace: true });
     }
   }, [currentUser, navigate]);
 
