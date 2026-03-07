@@ -119,8 +119,11 @@ const AuthPage: React.FC = () => {
     orContinue: "Or continue with",
     google: "Google",
     fullName: "Full Name",
-    
+    userType: "User Type",
+    student: "Student",
+    academicStaff: "Academic Staff",
     captchaError: "Please complete the captcha",
+    emailExists: "This email is already registered",
   };
 
   const handleGoogleSignIn = async () => {
