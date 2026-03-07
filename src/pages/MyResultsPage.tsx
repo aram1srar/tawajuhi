@@ -91,18 +91,7 @@ const MyResultsPage: React.FC = () => {
         setAiLoading(true);
         try {
           const { data: reportData } = await supabase.functions.invoke("analyze-strengths", {
-            body: {
-              results: results.map(r => ({
-                career_path: r.career_path,
-                theory_score: r.theory_score,
-                simulation_score: r.simulation_score,
-                total_score: r.total_score,
-                duration_seconds: r.duration_seconds,
-                recommended_paths: r.recommended_paths,
-                created_at: r.created_at,
-              })),
-              locale,
-            },
+            body: { locale },
           });
           if (reportData?.analysis) {
             setAiAnalysis(reportData.analysis);

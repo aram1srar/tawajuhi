@@ -31,14 +31,28 @@ serve(async (req) => {
       });
     }
 
-    const { results, locale } = await req.json();
+    const { locale } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // Fetch results server-side from the authenticated user
+    const userId = claimsData.claims.sub;
+    const { data: dbResults, error: dbError } = await supabase
+      .from("test_results")
+      .select("career_path, total_score, theory_score, simulation_score, duration_seconds, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (dbError || !dbResults?.length) {
+      return new Response(JSON.stringify({ error: "No results found" }), {
+        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const isArabic = locale === "ar";
 
-    const resultsSummary = (results as any[]).map((r: any) => {
+    const resultsSummary = dbResults.map((r: any) => {
       return `Path: ${r.career_path}, Score: ${r.total_score}%, Theory: ${r.theory_score}%, Interest: ${r.simulation_score}%, Duration: ${Math.round((r.duration_seconds || 0) / 60)}min, Date: ${r.created_at}`;
     }).join("\n");
 
