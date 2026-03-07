@@ -168,12 +168,9 @@ const MyResultsPage: React.FC = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-5xl flex-1">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-foreground mb-1">
-            {locale === "ar" ? `مرحباً، ${user?.user_metadata?.full_name || user?.user_metadata?.username || ""}!` : `Hello, ${user?.user_metadata?.full_name || user?.user_metadata?.username || ""}!`}
-          </h1>
-          <h2 className="text-xl font-semibold text-foreground mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             {locale === "ar" ? "نتائجي" : "My Results"}
-          </h2>
+          </h1>
           <p className="text-muted-foreground mb-10">
             {locale === "ar" ? "تحليل شامل لأدائك ومسارك المهني الأنسب" : "Comprehensive analysis of your performance and best career fit"}
           </p>
