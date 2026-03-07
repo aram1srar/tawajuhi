@@ -72,7 +72,7 @@ const AuthPage: React.FC = () => {
           }
         });
     }
-  }, [currentUser, navigate, authStep]);
+  }, [currentUser, navigate]);
 
   // Check username availability with debounce
   useEffect(() => {
