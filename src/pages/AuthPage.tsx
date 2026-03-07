@@ -376,8 +376,72 @@ const AuthPage: React.FC = () => {
             <p className="text-muted-foreground">{labels.subtitle}</p>
           </div>
 
-          {/* OTP Step */}
-          {authStep === "otp" ? (
+          {/* Verification Sent Screen */}
+          {authStep === "verification-sent" ? (
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Mail className="w-8 h-8 text-primary" />
+                </div>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-foreground">
+                  {locale === "ar" ? "تحقق من بريدك الإلكتروني" : "Check Your Email"}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {locale === "ar"
+                    ? "لقد أرسلنا رابط تأكيد إلى"
+                    : "We've sent a confirmation link to"}
+                </p>
+                <p className="font-medium text-foreground mt-1">{pendingEmail}</p>
+                <p className="text-sm text-muted-foreground mt-3">
+                  {locale === "ar"
+                    ? "انقر على الرابط في بريدك الإلكتروني لتفعيل حسابك والعودة إلى التطبيق."
+                    : "Click the link in your email to verify your account and return to the app."}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full rounded-lg gap-2"
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const { error } = await supabase.auth.resend({
+                      type: 'signup',
+                      email: pendingEmail,
+                      options: { emailRedirectTo: window.location.origin },
+                    });
+                    if (error) throw error;
+                    toast({
+                      title: locale === "ar" ? "تم" : "Sent",
+                      description: locale === "ar" ? "تم إعادة إرسال رابط التأكيد" : "Confirmation link resent",
+                    });
+                  } catch (err: any) {
+                    toast({
+                      title: locale === "ar" ? "خطأ" : "Error",
+                      description: err.message,
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                {loading ? "..." : (locale === "ar" ? "إعادة إرسال رابط التأكيد" : "Resend Confirmation Link")}
+              </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthStep("form");
+                  setPendingEmail("");
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {locale === "ar" ? "رجوع لتسجيل الدخول" : "Back to Login"}
+              </button>
+            </div>
+          ) : authStep === "otp" ? (
             <OTPVerification
               email={pendingEmail}
               onVerify={handleOTPVerify}
