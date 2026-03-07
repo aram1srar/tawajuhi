@@ -55,9 +55,9 @@ const AuthPage: React.FC = () => {
     setAuthStep("form");
   }, [mode]);
 
-  // Redirect after login (only when NOT in OTP step)
+  // Redirect after login
   useEffect(() => {
-    if (currentUser && authStep !== "otp") {
+    if (currentUser) {
       supabase
         .from("profiles")
         .select("user_type")
