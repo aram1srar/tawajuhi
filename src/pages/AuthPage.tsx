@@ -251,10 +251,9 @@ const AuthPage: React.FC = () => {
         }
         return;
       }
-      toast({
-        title: locale === "ar" ? "تم إنشاء الحساب" : "Account created",
-        description: locale === "ar" ? "تحقق من بريدك الإلكتروني للتفعيل" : "Check your email for verification",
-      });
+      // Show verification-sent screen
+      setPendingEmail(email);
+      setAuthStep("verification-sent");
     } catch (err: any) {
       toast({ title: locale === "ar" ? "خطأ" : "Error", description: err.message, variant: "destructive" });
     } finally {
