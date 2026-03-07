@@ -21,7 +21,7 @@ const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || "a454f292-79
 
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [authStep, setAuthStep] = useState<"form" | "otp">("form");
+  const [authStep, setAuthStep] = useState<"form" | "otp" | "verification-sent">("form");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
