@@ -323,13 +323,7 @@ const AuthPage: React.FC = () => {
         });
         return;
       }
-      if (data.dev_code) {
-        toast({
-          title: "🔐 Dev OTP Code",
-          description: `Your verification code: ${data.dev_code}`,
-          duration: 30000,
-        });
-      }
+      // OTP sent via email
       toast({
         title: locale === "ar" ? "تم" : "Sent",
         description: locale === "ar" ? "تم إعادة إرسال رمز التحقق" : "Verification code resent",
