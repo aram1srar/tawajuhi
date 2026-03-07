@@ -25,9 +25,12 @@ const AuthPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   
+  const [userType, setUserType] = useState<"student" | "academic_staff">("student");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const hcaptchaRef = useRef<HCaptcha>(null);
   const { signIn, signUp, user: currentUser } = useAuth();
   const { locale, setLocale } = useLanguage();
