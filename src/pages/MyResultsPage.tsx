@@ -245,11 +245,12 @@ const MyResultsPage: React.FC = () => {
                     </h3>
                     <div className="w-full h-[320px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
+                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="65%">
                           <PolarGrid stroke="hsl(210, 20%, 90%)" />
                           <PolarAngleAxis
                             dataKey="skill"
-                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 11 }}
+                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 10, dy: 2 }}
+                            tickFormatter={(value: string) => value.length > 12 ? value.slice(0, 12) + '…' : value}
                           />
                           <PolarRadiusAxis
                             angle={90}
