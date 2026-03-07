@@ -181,10 +181,27 @@ const AuthPage: React.FC = () => {
       if (mode === "login") {
         const { error } = await signIn(email, password);
         if (error) throw error;
-        navigate("/");
+        // Update user_type in profile on login
+        if (user) {
+          await supabase.from("profiles").update({ user_type: userType }).eq("user_id", user.id);
+        }
+        // Redirect is handled by useEffect on currentUser
       } else {
-        const { error } = await signUp(email, password, username, fullName);
-        if (error) throw error;
+        if (usernameError) {
+          toast({ title: locale === "ar" ? "خطأ" : "Error", description: usernameError, variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+        const { error } = await signUp(email, password, username, fullName, userType);
+        if (error) {
+          // Check for duplicate email
+          if (error.message?.includes("already registered") || error.message?.includes("already been registered")) {
+            toast({ title: locale === "ar" ? "خطأ" : "Error", description: labels.emailExists, variant: "destructive" });
+          } else {
+            throw error;
+          }
+          return;
+        }
         toast({
           title: locale === "ar" ? "تم إنشاء الحساب" : "Account created",
           description: locale === "ar" ? "تحقق من بريدك الإلكتروني للتفعيل" : "Check your email for verification",
