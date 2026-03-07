@@ -248,14 +248,13 @@ const MyResultsPage: React.FC = () => {
                       <Target className="w-4 h-4" />
                       {locale === "ar" ? "خريطة المهارات" : "Skills Radar"}
                     </h3>
-                    <div className="w-full h-[320px]">
+                    <div className="w-full h-[420px]">
                       <ResponsiveContainer width="100%" height="100%">
-                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="65%">
+                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="55%">
                           <PolarGrid stroke="hsl(210, 20%, 90%)" />
                           <PolarAngleAxis
                             dataKey="skill"
-                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 10, dy: 2 }}
-                            tickFormatter={(value: string) => value.length > 12 ? value.slice(0, 12) + '…' : value}
+                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 12 }}
                           />
                           <PolarRadiusAxis
                             angle={90}
