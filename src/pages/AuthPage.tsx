@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +26,7 @@ const AuthPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
-  const [userType, setUserType] = useState<"student" | "academic_staff">("student");
+  
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
@@ -58,19 +58,7 @@ const AuthPage: React.FC = () => {
   // Redirect after login
   useEffect(() => {
     if (currentUser) {
-      supabase
-        .from("profiles")
-        .select("user_type")
-        .eq("user_id", currentUser.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          const type = data?.user_type || "student";
-          if (type === "academic_staff") {
-            navigate("/student-results", { replace: true });
-          } else {
-            navigate("/", { replace: true });
-          }
-        });
+      navigate("/", { replace: true });
     }
   }, [currentUser, navigate]);
 
@@ -110,9 +98,6 @@ const AuthPage: React.FC = () => {
     orContinue: "أو تابع باستخدام",
     google: "Google",
     fullName: "الاسم الكامل",
-    userType: "نوع المستخدم",
-    student: "طالب",
-    academicStaff: "كادر أكاديمي",
     captchaError: "يرجى إكمال التحقق",
     emailExists: "البريد الإلكتروني مسجل مسبقاً",
     rateLimited: "محاولات كثيرة، حاول مرة أخرى لاحقاً",
@@ -130,9 +115,6 @@ const AuthPage: React.FC = () => {
     orContinue: "Or continue with",
     google: "Google",
     fullName: "Full Name",
-    userType: "User Type",
-    student: "Student",
-    academicStaff: "Academic Staff",
     captchaError: "Please complete the captcha",
     emailExists: "This email is already registered",
     rateLimited: "Too many attempts, please try again later",
@@ -252,7 +234,7 @@ const AuthPage: React.FC = () => {
         toast({ title: locale === "ar" ? "خطأ" : "Error", description: usernameError, variant: "destructive" });
         return;
       }
-      const { error } = await signUp(email, password, username, fullName, userType);
+      const { error } = await signUp(email, password, username, fullName, "student");
       if (error) {
         if (error.message?.includes("already registered") || error.message?.includes("already been registered")) {
           toast({ title: locale === "ar" ? "خطأ" : "Error", description: labels.emailExists, variant: "destructive" });
@@ -430,20 +412,6 @@ const AuthPage: React.FC = () => {
                   onSubmit={handleSubmit}
                   className="space-y-4"
                 >
-                  {/* User Type Dropdown */}
-                  <div className="space-y-2">
-                    <Label>{labels.userType}</Label>
-                    <Select value={userType} onValueChange={(v) => setUserType(v as "student" | "academic_staff")}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="student">{labels.student}</SelectItem>
-                        <SelectItem value="academic_staff">{labels.academicStaff}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   {mode === "signup" && (
                     <div className="space-y-2">
                       <Label htmlFor="username">{labels.username}</Label>
