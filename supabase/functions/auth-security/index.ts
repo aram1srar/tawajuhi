@@ -70,122 +70,38 @@ Deno.serve(async (req) => {
       return json({ allowed: true });
     }
 
-    // ─── VERIFY CREDENTIALS: Validate password server-side, generate OTP ───
-    if (action === 'verify-credentials') {
-      const { email, password } = body;
-      if (!email || !password) {
-        return json({ valid: false, message: 'Email and password required' }, 400);
-      }
+    // ─── LOG FAILED LOGIN: Track failed attempts + lock after 5 ───
+    if (action === 'log-failed-login') {
+      const { email } = body;
+      if (!email) return json({ success: false }, 400);
 
       const sanitizedEmail = email.trim().toLowerCase();
 
-      // Attempt sign-in with a temporary anon client
-      const tempClient = createClient(supabaseUrl, anonKey);
-      const { data, error } = await tempClient.auth.signInWithPassword({
-        email: sanitizedEmail,
-        password,
-      });
-
-      if (error) {
-        // Check if the error is due to unverified email
-        if (error.message?.includes('Email not confirmed')) {
-          // Resend confirmation email
-          await tempClient.auth.resend({
-            type: 'signup',
-            email: sanitizedEmail,
-            options: { emailRedirectTo: req.headers.get('origin') || undefined },
-          });
-
-          return json({
-            valid: false,
-            reason: 'email_not_verified',
-            message: 'Email not verified. A new confirmation link has been sent.',
-          });
-        }
-
-        // Log failed attempt
-        await adminClient.from('login_attempt_logs').insert({
-          email_or_username: sanitizedEmail,
-          success: false,
-        });
-
-        // Increment login_attempts, lock after 5 failures
-        const { data: securityInfo } = await adminClient
-          .rpc('get_profile_security', { p_email: sanitizedEmail });
-        const profile = securityInfo?.[0];
-
-        if (profile) {
-          const attempts = (profile.login_attempts || 0) + 1;
-          const updateData: Record<string, unknown> = { login_attempts: attempts };
-          if (attempts >= 5) {
-            updateData.locked_until = new Date(Date.now() + 15 * 60_000).toISOString();
-            updateData.login_attempts = 0;
-          }
-          await adminClient
-            .from('profiles')
-            .update(updateData)
-            .eq('user_id', profile.user_id);
-        }
-
-        return json({ valid: false, message: 'Invalid credentials' });
-      }
-
-      // Sign out immediately — session only created after OTP
-      await tempClient.auth.signOut();
-
-      // Log successful credential check
+      // Log failed attempt
       await adminClient.from('login_attempt_logs').insert({
         email_or_username: sanitizedEmail,
-        success: true,
+        success: false,
       });
 
-      // Reset login attempts
-      if (data.user) {
+      // Increment login_attempts, lock after 5 failures
+      const { data: securityInfo } = await adminClient
+        .rpc('get_profile_security', { p_email: sanitizedEmail });
+      const profile = securityInfo?.[0];
+
+      if (profile) {
+        const attempts = (profile.login_attempts || 0) + 1;
+        const updateData: Record<string, unknown> = { login_attempts: attempts };
+        if (attempts >= 5) {
+          updateData.locked_until = new Date(Date.now() + 15 * 60_000).toISOString();
+          updateData.login_attempts = 0;
+        }
         await adminClient
           .from('profiles')
-          .update({ login_attempts: 0, locked_until: null })
-          .eq('user_id', data.user.id);
+          .update(updateData)
+          .eq('user_id', profile.user_id);
       }
 
-      // Generate 6-digit OTP
-      const code = String(Math.floor(100_000 + Math.random() * 900_000));
-
-      // Invalidate previous OTPs
-      await adminClient
-        .from('otp_codes')
-        .update({ used: true })
-        .eq('email', sanitizedEmail)
-        .eq('purpose', 'login')
-        .eq('used', false);
-
-      // Store new OTP (expires in 5 minutes)
-      await adminClient.from('otp_codes').insert({
-        user_id: data.user!.id,
-        email: sanitizedEmail,
-        code,
-        purpose: 'login',
-        expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
-      });
-
-      // Send OTP via Resend email
-      const fnUrl = `${supabaseUrl}/functions/v1/send-otp-email`;
-      const emailRes = await fetch(fnUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${serviceRoleKey}`,
-        },
-        body: JSON.stringify({ email: sanitizedEmail, code, purpose: 'login' }),
-      });
-
-      if (!emailRes.ok) {
-        console.error('Failed to send OTP email:', await emailRes.text());
-      }
-
-      return json({
-        valid: true,
-        message: 'Verification code sent to your email',
-      });
+      return json({ success: true });
     }
 
     // ─── VERIFY OTP ───
