@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { lovable } from "@/integrations/lovable/index";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Globe, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useToast } from "@/hooks/use-toast";
@@ -23,9 +25,12 @@ const AuthPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   
+  const [userType, setUserType] = useState<"student" | "academic_staff">("student");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const hcaptchaRef = useRef<HCaptcha>(null);
   const { signIn, signUp, user: currentUser } = useAuth();
   const { locale, setLocale } = useLanguage();
@@ -46,12 +51,42 @@ const AuthPage: React.FC = () => {
     hcaptchaRef.current?.resetCaptcha();
   }, [mode]);
 
-  // Redirect if already logged in (e.g. after Google OAuth)
+  // Redirect based on user type after login
   useEffect(() => {
     if (currentUser) {
-      navigate("/", { replace: true });
+      // Update user_type in profile and redirect accordingly
+      supabase.from("profiles").update({ user_type: userType }).eq("user_id", currentUser.id).then(() => {
+        if (userType === "academic_staff") {
+          navigate("/student-results", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      });
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, userType]);
+
+  // Check username availability with debounce
+  useEffect(() => {
+    if (mode !== "signup" || !username.trim()) {
+      setUsernameError(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setCheckingUsername(true);
+      try {
+        const { data } = await supabase.rpc("is_username_taken", { p_username: username.trim() });
+        if (data === true) {
+          setUsernameError(locale === "ar" ? "اسم المستخدم مأخوذ بالفعل" : "Username already taken");
+        } else {
+          setUsernameError(null);
+        }
+      } catch {
+        setUsernameError(null);
+      }
+      setCheckingUsername(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [username, mode, locale]);
 
   const labels = locale === "ar" ? {
     login: "تسجيل الدخول",
@@ -66,8 +101,11 @@ const AuthPage: React.FC = () => {
     orContinue: "أو تابع باستخدام",
     google: "Google",
     fullName: "الاسم الكامل",
-    
+    userType: "نوع المستخدم",
+    student: "طالب",
+    academicStaff: "كادر أكاديمي",
     captchaError: "يرجى إكمال التحقق",
+    emailExists: "البريد الإلكتروني مسجل مسبقاً",
   } : {
     login: "Login",
     signup: "Sign Up",
@@ -81,8 +119,11 @@ const AuthPage: React.FC = () => {
     orContinue: "Or continue with",
     google: "Google",
     fullName: "Full Name",
-    
+    userType: "User Type",
+    student: "Student",
+    academicStaff: "Academic Staff",
     captchaError: "Please complete the captcha",
+    emailExists: "This email is already registered",
   };
 
   const handleGoogleSignIn = async () => {
@@ -140,10 +181,23 @@ const AuthPage: React.FC = () => {
       if (mode === "login") {
         const { error } = await signIn(email, password);
         if (error) throw error;
-        navigate("/");
+        // Redirect is handled by useEffect on currentUser
       } else {
-        const { error } = await signUp(email, password, username, fullName);
-        if (error) throw error;
+        if (usernameError) {
+          toast({ title: locale === "ar" ? "خطأ" : "Error", description: usernameError, variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+        const { error } = await signUp(email, password, username, fullName, userType);
+        if (error) {
+          // Check for duplicate email
+          if (error.message?.includes("already registered") || error.message?.includes("already been registered")) {
+            toast({ title: locale === "ar" ? "خطأ" : "Error", description: labels.emailExists, variant: "destructive" });
+          } else {
+            throw error;
+          }
+          return;
+        }
         toast({
           title: locale === "ar" ? "تم إنشاء الحساب" : "Account created",
           description: locale === "ar" ? "تحقق من بريدك الإلكتروني للتفعيل" : "Check your email for verification",
@@ -239,13 +293,30 @@ const AuthPage: React.FC = () => {
               onSubmit={handleSubmit}
               className="space-y-4"
             >
+              {/* User Type Dropdown */}
+              <div className="space-y-2">
+                <Label>{labels.userType}</Label>
+                <Select value={userType} onValueChange={(v) => setUserType(v as "student" | "academic_staff")}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="student">{labels.student}</SelectItem>
+                    <SelectItem value="academic_staff">{labels.academicStaff}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {mode === "signup" && (
                 <div className="space-y-2">
                   <Label htmlFor="username">{labels.username}</Label>
                   <div className="relative">
                     <User className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="ps-10" required />
+                    <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className={`ps-10 ${usernameError ? "border-destructive" : ""}`} required />
                   </div>
+                  {usernameError && (
+                    <p className="text-xs text-destructive">{usernameError}</p>
+                  )}
                 </div>
               )}
 
