@@ -375,18 +375,6 @@ const AuthPage: React.FC = () => {
                 {locale === "ar" ? "رجوع لتسجيل الدخول" : "Back to Login"}
               </button>
             </div>
-          ) : authStep === "otp" ? (
-            <OTPVerification
-              email={pendingEmail}
-              onVerify={handleOTPVerify}
-              onResend={handleOTPResend}
-              onBack={() => {
-                setAuthStep("form");
-                setPendingPassword("");
-              }}
-              loading={loading}
-              locale={locale as "ar" | "en"}
-            />
           ) : (
             <>
               {/* Tab switcher */}
