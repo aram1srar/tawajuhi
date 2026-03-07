@@ -87,6 +87,22 @@ Deno.serve(async (req) => {
       });
 
       if (error) {
+        // Check if the error is due to unverified email
+        if (error.message?.includes('Email not confirmed')) {
+          // Resend confirmation email
+          await tempClient.auth.resend({
+            type: 'signup',
+            email: sanitizedEmail,
+            options: { emailRedirectTo: req.headers.get('origin') || undefined },
+          });
+
+          return json({
+            valid: false,
+            reason: 'email_not_verified',
+            message: 'Email not verified. A new confirmation link has been sent.',
+          });
+        }
+
         // Log failed attempt
         await adminClient.from('login_attempt_logs').insert({
           email_or_username: sanitizedEmail,
