@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Globe, LogOut, BarChart3 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Globe, LogOut, BarChart3, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-new.png";
 
@@ -10,6 +11,14 @@ const Header: React.FC = () => {
   const { locale, setLocale, t } = useLanguage();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [userType, setUserType] = useState<string>("student");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("user_type").eq("user_id", user.id).single().then(({ data }) => {
+      if (data?.user_type) setUserType(data.user_type);
+    });
+  }, [user]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -36,10 +45,17 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/my-results")}>
-                <BarChart3 className="w-4 h-4 me-1" />
-                {locale === "ar" ? "نتائجي" : "My Results"}
-              </Button>
+              {userType === "academic_staff" ? (
+                <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/student-results")}>
+                  <Users className="w-4 h-4 me-1" />
+                  {locale === "ar" ? "طلابي" : "My Students"}
+                </Button>
+              ) : (
+                <Button size="sm" variant="outline" className="rounded-full" onClick={() => navigate("/my-results")}>
+                  <BarChart3 className="w-4 h-4 me-1" />
+                  {locale === "ar" ? "نتائجي" : "My Results"}
+                </Button>
+              )}
               <button
                 onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-all"
