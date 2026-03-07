@@ -256,9 +256,22 @@ Deno.serve(async (req) => {
         expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
       });
 
-      console.log(`[DEV] Resent OTP for ${sanitizedEmail}: ${code}`);
+      // Send OTP via Resend email
+      const fnUrl = `${supabaseUrl}/functions/v1/send-otp-email`;
+      const emailRes = await fetch(fnUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`,
+        },
+        body: JSON.stringify({ email: sanitizedEmail, code, purpose }),
+      });
 
-      return json({ success: true, dev_code: code });
+      if (!emailRes.ok) {
+        console.error('Failed to send OTP email:', await emailRes.text());
+      }
+
+      return json({ success: true });
     }
 
     return json({ error: 'Unknown action' }, 400);
