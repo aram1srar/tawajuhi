@@ -51,12 +51,42 @@ const AuthPage: React.FC = () => {
     hcaptchaRef.current?.resetCaptcha();
   }, [mode]);
 
-  // Redirect if already logged in (e.g. after Google OAuth)
+  // Redirect based on user type after login
   useEffect(() => {
     if (currentUser) {
-      navigate("/", { replace: true });
+      // Check user type from profile
+      supabase.from("profiles").select("user_type").eq("user_id", currentUser.id).single().then(({ data }) => {
+        if (data?.user_type === "academic_staff") {
+          navigate("/student-results", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      });
     }
   }, [currentUser, navigate]);
+
+  // Check username availability with debounce
+  useEffect(() => {
+    if (mode !== "signup" || !username.trim()) {
+      setUsernameError(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setCheckingUsername(true);
+      try {
+        const { data } = await supabase.rpc("is_username_taken", { p_username: username.trim() });
+        if (data === true) {
+          setUsernameError(locale === "ar" ? "اسم المستخدم مأخوذ بالفعل" : "Username already taken");
+        } else {
+          setUsernameError(null);
+        }
+      } catch {
+        setUsernameError(null);
+      }
+      setCheckingUsername(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [username, mode, locale]);
 
   const labels = locale === "ar" ? {
     login: "تسجيل الدخول",
