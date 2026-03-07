@@ -180,6 +180,16 @@ const AuthPage: React.FC = () => {
 
       if (credError) throw new Error(credError.message);
       if (!credData.valid) {
+        // Handle unverified email — show verification-sent screen
+        if (credData.reason === 'email_not_verified') {
+          setPendingEmail(email);
+          setAuthStep("verification-sent");
+          toast({
+            title: locale === "ar" ? "تنبيه" : "Notice",
+            description: locale === "ar" ? "بريدك غير مفعل. تم إرسال رابط تأكيد جديد." : credData.message,
+          });
+          return;
+        }
         toast({
           title: locale === "ar" ? "خطأ" : "Error",
           description: locale === "ar" ? "بيانات الدخول غير صحيحة" : credData.message,
