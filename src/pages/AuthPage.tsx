@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
-import OTPVerification from "@/components/auth/OTPVerification";
+
 import logoImg from "@/assets/logo-new.png";
 
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || "a454f292-79ba-429e-98ac-401823442df6";
