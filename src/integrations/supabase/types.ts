@@ -43,11 +43,70 @@ export type Database = {
           },
         ]
       }
+      login_attempt_logs: {
+        Row: {
+          attempt_time: string
+          email_or_username: string
+          id: string
+          ip_address: string | null
+          success: boolean
+        }
+        Insert: {
+          attempt_time?: string
+          email_or_username: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+        }
+        Update: {
+          attempt_time?: string
+          email_or_username?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
+      otp_codes: {
+        Row: {
+          code: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          purpose: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          purpose?: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          purpose?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           full_name: string | null
           id: string
+          locked_until: string | null
+          login_attempts: number
           phone_number: string | null
           updated_at: string
           user_id: string
@@ -58,6 +117,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          locked_until?: string | null
+          login_attempts?: number
           phone_number?: string | null
           updated_at?: string
           user_id: string
@@ -68,6 +129,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          locked_until?: string | null
+          login_attempts?: number
           phone_number?: string | null
           updated_at?: string
           user_id?: string
@@ -144,6 +207,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_otps: { Args: never; Returns: undefined }
+      get_profile_security: {
+        Args: { p_email: string }
+        Returns: {
+          locked_until: string
+          login_attempts: number
+          user_id: string
+        }[]
+      }
       get_student_by_email: {
         Args: { p_email: string }
         Returns: {
