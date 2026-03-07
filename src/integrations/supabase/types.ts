@@ -108,6 +108,7 @@ export type Database = {
           locked_until: string | null
           login_attempts: number
           phone_number: string | null
+          role_confirmed: boolean
           updated_at: string
           user_id: string
           user_type: string
@@ -120,6 +121,7 @@ export type Database = {
           locked_until?: string | null
           login_attempts?: number
           phone_number?: string | null
+          role_confirmed?: boolean
           updated_at?: string
           user_id: string
           user_type?: string
@@ -132,6 +134,7 @@ export type Database = {
           locked_until?: string | null
           login_attempts?: number
           phone_number?: string | null
+          role_confirmed?: boolean
           updated_at?: string
           user_id?: string
           user_type?: string
