@@ -14,14 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import { getPasswordStrength, checkPasswordServer } from "@/lib/password-validation";
-import OTPVerification from "@/components/auth/OTPVerification";
+
 import logoImg from "@/assets/logo-new.png";
 
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || "a454f292-79ba-429e-98ac-401823442df6";
 
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [authStep, setAuthStep] = useState<"form" | "otp" | "verification-sent">("form");
+  const [authStep, setAuthStep] = useState<"form" | "verification-sent">("form");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -32,9 +32,7 @@ const AuthPage: React.FC = () => {
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
-  // OTP state
   const [pendingEmail, setPendingEmail] = useState("");
-  const [pendingPassword, setPendingPassword] = useState("");
 
   const hcaptchaRef = useRef<HCaptcha>(null);
   const { signIn, signUp, user: currentUser } = useAuth();
@@ -57,9 +55,9 @@ const AuthPage: React.FC = () => {
     setAuthStep("form");
   }, [mode]);
 
-  // Redirect after login (only when NOT in OTP step)
+  // Redirect after login
   useEffect(() => {
-    if (currentUser && authStep !== "otp") {
+    if (currentUser) {
       supabase
         .from("profiles")
         .select("user_type")
@@ -74,7 +72,7 @@ const AuthPage: React.FC = () => {
           }
         });
     }
-  }, [currentUser, navigate, authStep]);
+  }, [currentUser, navigate]);
 
   // Check username availability with debounce
   useEffect(() => {
@@ -173,37 +171,39 @@ const AuthPage: React.FC = () => {
         return;
       }
 
-      // Step 2: Verify credentials server-side & generate OTP
-      const { data: credData, error: credError } = await supabase.functions.invoke("auth-security", {
-        body: { action: "verify-credentials", email, password },
-      });
-
-      if (credError) throw new Error(credError.message);
-      if (!credData.valid) {
-        // Handle unverified email — show verification-sent screen
-        if (credData.reason === 'email_not_verified') {
+      // Step 2: Sign in directly
+      const { error } = await signIn(email, password);
+      if (error) {
+        // Handle unverified email
+        if (error.message?.includes("Email not confirmed")) {
+          // Resend confirmation link
+          await supabase.auth.resend({
+            type: 'signup',
+            email: email.trim().toLowerCase(),
+            options: { emailRedirectTo: window.location.origin },
+          });
           setPendingEmail(email);
           setAuthStep("verification-sent");
           toast({
             title: locale === "ar" ? "تنبيه" : "Notice",
-            description: locale === "ar" ? "بريدك غير مفعل. تم إرسال رابط تأكيد جديد." : credData.message,
+            description: locale === "ar" ? "بريدك غير مفعل. تم إرسال رابط تأكيد جديد." : "Email not verified. A new confirmation link has been sent.",
           });
           return;
         }
+
+        // Log failed attempt server-side
+        await supabase.functions.invoke("auth-security", {
+          body: { action: "log-failed-login", email },
+        });
+
         toast({
           title: locale === "ar" ? "خطأ" : "Error",
-          description: locale === "ar" ? "بيانات الدخول غير صحيحة" : credData.message,
+          description: locale === "ar" ? "بيانات الدخول غير صحيحة" : "Invalid credentials",
           variant: "destructive",
         });
         return;
       }
-
-      // Store credentials for after OTP verification
-      setPendingEmail(email);
-      setPendingPassword(password);
-      setAuthStep("otp");
-
-      // OTP sent via email
+      // Redirect handled by useEffect
     } catch (err: any) {
       toast({
         title: locale === "ar" ? "خطأ" : "Error",
@@ -277,72 +277,6 @@ const AuthPage: React.FC = () => {
       await handleLoginSubmit();
     } else {
       await handleSignupSubmit();
-    }
-  };
-
-  const handleOTPVerify = async (code: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("auth-security", {
-        body: { action: "verify-otp", email: pendingEmail, code, purpose: "login" },
-      });
-
-      if (error) throw new Error(error.message);
-      if (!data.valid) {
-        toast({
-          title: locale === "ar" ? "خطأ" : "Error",
-          description: locale === "ar"
-            ? (data.message.includes("expired") ? "انتهت صلاحية رمز التحقق" : "رمز التحقق غير صحيح")
-            : data.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // OTP verified — now create the browser session
-      const { error: signInError } = await signIn(pendingEmail, pendingPassword);
-      if (signInError) throw signInError;
-
-      // Clear sensitive data
-      setPendingPassword("");
-      setAuthStep("form");
-      // Redirect will happen via useEffect
-    } catch (err: any) {
-      toast({
-        title: locale === "ar" ? "خطأ" : "Error",
-        description: err.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOTPResend = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke("auth-security", {
-        body: { action: "resend-otp", email: pendingEmail, purpose: "login" },
-      });
-      if (error) throw new Error(error.message);
-      if (!data.success) {
-        toast({
-          title: locale === "ar" ? "خطأ" : "Error",
-          description: data.message,
-          variant: "destructive",
-        });
-        return;
-      }
-      // OTP sent via email
-      toast({
-        title: locale === "ar" ? "تم" : "Sent",
-        description: locale === "ar" ? "تم إعادة إرسال رمز التحقق" : "Verification code resent",
-      });
-    } catch (err: any) {
-      toast({
-        title: locale === "ar" ? "خطأ" : "Error",
-        description: err.message,
-        variant: "destructive",
-      });
     }
   };
 
@@ -441,18 +375,6 @@ const AuthPage: React.FC = () => {
                 {locale === "ar" ? "رجوع لتسجيل الدخول" : "Back to Login"}
               </button>
             </div>
-          ) : authStep === "otp" ? (
-            <OTPVerification
-              email={pendingEmail}
-              onVerify={handleOTPVerify}
-              onResend={handleOTPResend}
-              onBack={() => {
-                setAuthStep("form");
-                setPendingPassword("");
-              }}
-              loading={loading}
-              locale={locale as "ar" | "en"}
-            />
           ) : (
             <>
               {/* Tab switcher */}
