@@ -412,20 +412,6 @@ const AuthPage: React.FC = () => {
                   onSubmit={handleSubmit}
                   className="space-y-4"
                 >
-                  {/* User Type Dropdown */}
-                  <div className="space-y-2">
-                    <Label>{labels.userType}</Label>
-                    <Select value={userType} onValueChange={(v) => setUserType(v as "student" | "academic_staff")}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="student">{labels.student}</SelectItem>
-                        <SelectItem value="academic_staff">{labels.academicStaff}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   {mode === "signup" && (
                     <div className="space-y-2">
                       <Label htmlFor="username">{labels.username}</Label>
