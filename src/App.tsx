@@ -15,6 +15,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CareerPathPage from "./pages/CareerPathPage";
 import GeneralExamPage from "./pages/GeneralExamPage";
+import StudentResultsPage from "./pages/StudentResultsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
