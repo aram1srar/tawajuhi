@@ -11,6 +11,14 @@ const Header: React.FC = () => {
   const { locale, setLocale, t } = useLanguage();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [userType, setUserType] = useState<string>("student");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("user_type").eq("user_id", user.id).single().then(({ data }) => {
+      if (data?.user_type) setUserType(data.user_type);
+    });
+  }, [user]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
