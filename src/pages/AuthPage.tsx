@@ -101,8 +101,11 @@ const AuthPage: React.FC = () => {
     orContinue: "أو تابع باستخدام",
     google: "Google",
     fullName: "الاسم الكامل",
-    
+    userType: "نوع المستخدم",
+    student: "طالب",
+    academicStaff: "كادر أكاديمي",
     captchaError: "يرجى إكمال التحقق",
+    emailExists: "البريد الإلكتروني مسجل مسبقاً",
   } : {
     login: "Login",
     signup: "Sign Up",
