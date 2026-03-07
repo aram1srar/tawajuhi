@@ -171,37 +171,39 @@ const AuthPage: React.FC = () => {
         return;
       }
 
-      // Step 2: Verify credentials server-side & generate OTP
-      const { data: credData, error: credError } = await supabase.functions.invoke("auth-security", {
-        body: { action: "verify-credentials", email, password },
-      });
-
-      if (credError) throw new Error(credError.message);
-      if (!credData.valid) {
-        // Handle unverified email — show verification-sent screen
-        if (credData.reason === 'email_not_verified') {
+      // Step 2: Sign in directly
+      const { error } = await signIn(email, password);
+      if (error) {
+        // Handle unverified email
+        if (error.message?.includes("Email not confirmed")) {
+          // Resend confirmation link
+          await supabase.auth.resend({
+            type: 'signup',
+            email: email.trim().toLowerCase(),
+            options: { emailRedirectTo: window.location.origin },
+          });
           setPendingEmail(email);
           setAuthStep("verification-sent");
           toast({
             title: locale === "ar" ? "تنبيه" : "Notice",
-            description: locale === "ar" ? "بريدك غير مفعل. تم إرسال رابط تأكيد جديد." : credData.message,
+            description: locale === "ar" ? "بريدك غير مفعل. تم إرسال رابط تأكيد جديد." : "Email not verified. A new confirmation link has been sent.",
           });
           return;
         }
+
+        // Log failed attempt server-side
+        await supabase.functions.invoke("auth-security", {
+          body: { action: "log-failed-login", email },
+        });
+
         toast({
           title: locale === "ar" ? "خطأ" : "Error",
-          description: locale === "ar" ? "بيانات الدخول غير صحيحة" : credData.message,
+          description: locale === "ar" ? "بيانات الدخول غير صحيحة" : "Invalid credentials",
           variant: "destructive",
         });
         return;
       }
-
-      // Store credentials for after OTP verification
-      setPendingEmail(email);
-      setPendingPassword(password);
-      setAuthStep("otp");
-
-      // OTP sent via email
+      // Redirect handled by useEffect
     } catch (err: any) {
       toast({
         title: locale === "ar" ? "خطأ" : "Error",
