@@ -377,7 +377,7 @@ const StudentResultsPage: React.FC = () => {
               })}
             </div>
           </motion.div>
-        ))
+        ))}
 
         {classes.length === 0 && (
           <div className="text-center py-16">
