@@ -248,13 +248,47 @@ const MyResultsPage: React.FC = () => {
                       <Target className="w-4 h-4" />
                       {locale === "ar" ? "خريطة المهارات" : "Skills Radar"}
                     </h3>
-                    <div className="w-full h-[420px]">
+                    <div className="w-full h-[460px]">
                       <ResponsiveContainer width="100%" height="100%">
-                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="55%">
+                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="42%">
                           <PolarGrid stroke="hsl(210, 20%, 90%)" />
                           <PolarAngleAxis
                             dataKey="skill"
-                            tick={{ fill: "hsl(210, 15%, 50%)", fontSize: 12 }}
+                            tick={(props: any) => {
+                              const { x, y, payload, cx: centerX, cy: centerY } = props;
+                              const dx = x - centerX;
+                              const dy = y - centerY;
+                              const dist = Math.sqrt(dx * dx + dy * dy);
+                              const normX = dx / (dist || 1);
+                              const normY = dy / (dist || 1);
+                              const offset = 28;
+                              const labelX = x + normX * offset;
+                              const labelY = y + normY * offset;
+                              const anchor = normX < -0.1 ? "end" : normX > 0.1 ? "start" : "middle";
+                              return (
+                                <g>
+                                  <line
+                                    x1={x}
+                                    y1={y}
+                                    x2={labelX - normX * 4}
+                                    y2={labelY - normY * 4}
+                                    stroke="hsl(210, 20%, 80%)"
+                                    strokeWidth={1}
+                                  />
+                                  <text
+                                    x={labelX}
+                                    y={labelY}
+                                    textAnchor={anchor}
+                                    dominantBaseline="central"
+                                    fill="hsl(210, 15%, 45%)"
+                                    fontSize={12}
+                                    fontWeight={500}
+                                  >
+                                    {payload.value}
+                                  </text>
+                                </g>
+                              );
+                            }}
                           />
                           <PolarRadiusAxis
                             angle={90}
