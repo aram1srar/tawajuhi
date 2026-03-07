@@ -54,16 +54,16 @@ const AuthPage: React.FC = () => {
   // Redirect based on user type after login
   useEffect(() => {
     if (currentUser) {
-      // Check user type from profile
-      supabase.from("profiles").select("user_type").eq("user_id", currentUser.id).single().then(({ data }) => {
-        if (data?.user_type === "academic_staff") {
+      // Update user_type in profile and redirect accordingly
+      supabase.from("profiles").update({ user_type: userType }).eq("user_id", currentUser.id).then(() => {
+        if (userType === "academic_staff") {
           navigate("/student-results", { replace: true });
         } else {
           navigate("/", { replace: true });
         }
       });
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, userType]);
 
   // Check username availability with debounce
   useEffect(() => {
