@@ -193,14 +193,7 @@ const AuthPage: React.FC = () => {
       setPendingPassword(password);
       setAuthStep("otp");
 
-      // Show dev OTP in toast (remove in production)
-      if (credData.dev_code) {
-        toast({
-          title: "🔐 Dev OTP Code",
-          description: `Your verification code: ${credData.dev_code}`,
-          duration: 30000,
-        });
-      }
+      // OTP sent via email
     } catch (err: any) {
       toast({
         title: locale === "ar" ? "خطأ" : "Error",
