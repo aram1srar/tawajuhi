@@ -181,10 +181,6 @@ const AuthPage: React.FC = () => {
       if (mode === "login") {
         const { error } = await signIn(email, password);
         if (error) throw error;
-        // Update user_type in profile on login
-        if (user) {
-          await supabase.from("profiles").update({ user_type: userType }).eq("user_id", user.id);
-        }
         // Redirect is handled by useEffect on currentUser
       } else {
         if (usernameError) {
