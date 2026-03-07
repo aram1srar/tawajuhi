@@ -38,39 +38,6 @@ export type Database = {
         }
         Relationships: []
       }
-      otp_codes: {
-        Row: {
-          code: string
-          created_at: string
-          email: string
-          expires_at: string
-          id: string
-          purpose: string
-          used: boolean
-          user_id: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          email: string
-          expires_at: string
-          id?: string
-          purpose?: string
-          used?: boolean
-          user_id: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          email?: string
-          expires_at?: string
-          id?: string
-          purpose?: string
-          used?: boolean
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
@@ -160,7 +127,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_otps: { Args: never; Returns: undefined }
       get_profile_security: {
         Args: { p_email: string }
         Returns: {
