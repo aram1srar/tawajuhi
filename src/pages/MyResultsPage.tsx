@@ -248,9 +248,9 @@ const MyResultsPage: React.FC = () => {
                       <Target className="w-4 h-4" />
                       {locale === "ar" ? "خريطة المهارات" : "Skills Radar"}
                     </h3>
-                    <div className="w-full h-[500px]">
+                    <div className="w-full h-[420px]">
                       <ResponsiveContainer width="100%" height="100%">
-                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="45%" margin={{ top: 40, right: 60, bottom: 40, left: 60 }}>
+                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="55%">
                           <PolarGrid stroke="hsl(210, 20%, 90%)" />
                           <PolarAngleAxis
                             dataKey="skill"
