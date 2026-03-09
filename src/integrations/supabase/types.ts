@@ -127,14 +127,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_profile_security: {
-        Args: { p_email: string }
-        Returns: {
-          locked_until: string
-          login_attempts: number
-          user_id: string
-        }[]
-      }
       is_username_taken: { Args: { p_username: string }; Returns: boolean }
     }
     Enums: {
