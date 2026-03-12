@@ -276,6 +276,19 @@ export const questions: Record<string, Question[]> = {
     { id: "b_strategic1", type: "theory", path: "business",
       question: { ar: "ما هو مفهوم الإدارة الاستراتيجية؟", en: "What is the concept of strategic management?" },
       options: [{ ar: "تنظيم الموارد", en: "Organizing resources" }, { ar: "وضع الخطط لتحقيق الأهداف طويلة المدى", en: "Setting plans to achieve long-term goals" }, { ar: "الإنتاج فقط", en: "Production only" }, { ar: "تحديد الموردين", en: "Identifying suppliers" }], correctIndex: 1, explanation: { ar: "", en: "" } },
+    // NEW: Expressive open-ended questions for deeper analysis
+    { id: "b_expr1", type: "open", path: "business",
+      question: { ar: "لو كان لديك مبلغ 100,000 ريال لتبدأ مشروعك الخاص، ما هو المشروع الذي ستختاره؟ ولماذا تعتقد أنه سينجح في السوق السعودي؟", en: "If you had 100,000 SAR to start your own business, what would you choose? Why do you think it would succeed in the Saudi market?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "b_expr2", type: "open", path: "business",
+      question: { ar: "اذكر موقفاً قُدت فيه مجموعة من الأشخاص (في المدرسة أو خارجها). ما التحديات التي واجهتها وكيف تغلبت عليها؟ وماذا تعلمت عن القيادة؟", en: "Describe a situation where you led a group (in school or outside). What challenges did you face and how did you overcome them? What did you learn about leadership?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "b_expr3", type: "open", path: "business",
+      question: { ar: "إذا كنت مديراً لشركة ناشئة وبدأت الشركة تخسر عملاءها، ما هي الخطوات التي ستتخذها لإنقاذ الشركة؟ فكّر بشكل إبداعي.", en: "If you were managing a startup that's losing customers, what steps would you take to save it? Think creatively." },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "b_expr4", type: "open", path: "business",
+      question: { ar: "ما رأيك في رؤية 2030 من الناحية الاقتصادية؟ وكيف يمكن لشاب سعودي متخصص في إدارة الأعمال أن يساهم في تحقيقها؟", en: "What's your opinion on Vision 2030 economically? How can a young Saudi business graduate contribute to achieving it?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
   ],
   shariah: [
     // Original theory (8)
