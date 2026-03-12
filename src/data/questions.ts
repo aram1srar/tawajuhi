@@ -188,6 +188,19 @@ export const questions: Record<string, Question[]> = {
     { id: "h_medicine1", type: "theory", path: "health",
       question: { ar: "ما هو التوحيد في الطب؟", en: "What is integration in medicine?" },
       options: [{ ar: "التأكد من عدم تفاعل الأدوية مع بعضها", en: "Ensuring drugs don't interact with each other" }, { ar: "استخدام العلاج الواحد لجميع الحالات", en: "Using one treatment for all cases" }, { ar: "التركيز على العلاج الروحي فقط", en: "Focusing on spiritual treatment only" }, { ar: "التكامل بين العلاجات التقليدية والعصرية", en: "Integration between traditional and modern treatments" }], correctIndex: 3, explanation: { ar: "", en: "" } },
+    // NEW: Expressive open-ended questions for deeper analysis
+    { id: "h_expr1", type: "open", path: "health",
+      question: { ar: "لماذا اخترت أن تتوجه نحو المجال الصحي؟ ما الذي يحفزك ويدفعك للاهتمام بصحة الآخرين؟ اذكر موقفاً شخصياً أثّر في قرارك.", en: "Why did you choose the health field? What motivates you to care for others' health? Mention a personal experience that influenced your decision." },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "h_expr2", type: "open", path: "health",
+      question: { ar: "إذا كان لديك مريض يرفض العلاج بسبب معتقداته الشخصية، كيف ستتعامل معه مع الحفاظ على احترامك لقراره وفي نفس الوقت حماية صحته؟", en: "If a patient refuses treatment due to personal beliefs, how would you handle it while respecting their decision and protecting their health?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "h_expr3", type: "open", path: "health",
+      question: { ar: "ما هي أكبر مشكلة صحية تعتقد أن المجتمع السعودي يواجهها اليوم؟ وكيف يمكن لمتخصص صحي شاب أن يساهم في حلها؟", en: "What's the biggest health problem Saudi society faces today? How can a young health professional contribute to solving it?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "h_expr4", type: "open", path: "health",
+      question: { ar: "صِف موقفاً تعرّضت فيه لضغط نفسي أو مسؤولية كبيرة. كيف تعاملت مع الضغط؟ وهل تعتقد أن هذه المهارة مهمة في المجال الصحي؟", en: "Describe a situation where you faced significant stress or responsibility. How did you handle it? Do you think this skill is important in healthcare?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
   ],
   business: [
     // Original theory (8)
