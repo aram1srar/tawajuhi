@@ -16,12 +16,12 @@ const TestPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Get 18 MCQ + 2 open-ended from this path
-  const mcqQuestions = useMemo(() => getPathwayExamQuestions(path || "", 18), [path]);
+  // Get 16 MCQ + 4 open-ended from this path
+  const mcqQuestions = useMemo(() => getPathwayExamQuestions(path || "", 16), [path]);
   const openQuestions = useMemo(() => {
     const pool = getOpenEndedQuestions(path || "");
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 2);
+    return shuffled.slice(0, 4);
   }, [path]);
   const pathQuestions = useMemo(() => [...mcqQuestions, ...openQuestions], [mcqQuestions, openQuestions]);
 

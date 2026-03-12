@@ -29,8 +29,8 @@ const ExamIntro: React.FC<{ onStart: () => void }> = ({ onStart }) => {
         </h1>
         <p className="text-muted-foreground mb-6 leading-relaxed">
           {locale === "ar"
-            ? "40 سؤال من جميع المسارات المهنية. أجب بصدق لنحدد المسار الأنسب لك."
-            : "40 questions across all career paths. Answer honestly so we can find the best path for you."}
+            ? "40 سؤال من جميع المسارات المهنية، منها أسئلة مقالية تعبيرية. أجب بصدق لنحدد المسار الأنسب لك."
+            : "40 questions across all career paths, including expressive essay questions. Answer honestly so we can find the best path for you."}
         </p>
 
         {/* Disclaimer note */}

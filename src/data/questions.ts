@@ -433,9 +433,9 @@ export function getOpenEndedQuestions(path?: string): Question[] {
 }
 
 // Helper to get random questions for the general exam with equal parts from each pathway
-// 38 MCQ + 2 open-ended (added by AI) = 40 total
+// 36 MCQ + 4 open-ended = 40 total
 // Equal parts from each of the 4 pathways, plus preference questions
-export function getGeneralExamQuestions(count: number = 38): Question[] {
+export function getGeneralExamQuestions(count: number = 36): Question[] {
   const paths = ["cs", "health", "business", "shariah"];
   // Reserve spots for preference questions (4 total)
   const prefCount = Math.min(preferenceQuestions.length, 4);
