@@ -101,14 +101,20 @@ const ResultsPage: React.FC = () => {
           openEndedAnalysis: generalState.openEndedAnalysis || null,
         },
       }).then(({ data, error }) => {
-        if (data?.structured && data?.analysis) {
+        if (error) {
+          console.error("AI analysis error:", error);
+        } else if (data?.error) {
+          console.warn("AI analysis unavailable:", data.error);
+          if (data.error === "Payment required" || data.error === "Rate limited") {
+            toast.error(locale === "ar" ? "رصيد الذكاء الاصطناعي غير كافٍ. يمكنك مراجعة نتائجك بدون التحليل الذكي." : "AI credits depleted. Results are still available without AI analysis.");
+          }
+        } else if (data?.structured && data?.analysis) {
           setAiAnalysis(data.analysis);
         } else if (data?.analysis) {
           setAiText(typeof data.analysis === "string" ? data.analysis : JSON.stringify(data.analysis));
         }
-        if (error) console.error("AI analysis error:", error);
         setAiLoading(false);
-      });
+      }).catch(() => setAiLoading(false));
     }
   }, []);
 
