@@ -364,6 +364,19 @@ export const questions: Record<string, Question[]> = {
     { id: "sh_usul1", type: "theory", path: "shariah",
       question: { ar: "ما هو الفرق بين الفقه وأصول الفقه؟", en: "What is the difference between Fiqh and Usul al-Fiqh?" },
       options: [{ ar: "الفقه يتعلق بالمعاملات فقط", en: "Fiqh relates to transactions only" }, { ar: "الفقه هو التفسير الشخصي للأدلة", en: "Fiqh is personal interpretation of evidence" }, { ar: "أصول الفقه هي القواعد التي يعتمد عليها الفقهاء لتفسير النصوص الشرعية", en: "Usul al-Fiqh are the rules scholars rely on to interpret religious texts" }, { ar: "الفقه هو تفسير القرآن فقط", en: "Fiqh is interpretation of Quran only" }], correctIndex: 2, explanation: { ar: "", en: "" } },
+    // NEW: Expressive open-ended questions for deeper analysis
+    { id: "sh_expr1", type: "open", path: "shariah",
+      question: { ar: "كيف ترى دور العالم الشرعي في المجتمع المعاصر؟ وما هي أهم القضايا التي يجب أن يتصدى لها؟ اذكر أمثلة.", en: "How do you see the role of an Islamic scholar in modern society? What are the most important issues they should address? Give examples." },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "sh_expr2", type: "open", path: "shariah",
+      question: { ar: "اذكر موقفاً شهدت فيه خلافاً بين شخصين. كيف تعاملت معه أو كيف كنت ستتعامل معه لو طُلب منك الحكم بينهما بالعدل؟", en: "Describe a situation where you witnessed a dispute. How did you handle it, or how would you have judged fairly between them?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "sh_expr3", type: "open", path: "shariah",
+      question: { ar: "ما الفرق بين تطبيق الشريعة بحرفيتها وفهم مقاصدها؟ أعطِ مثالاً عملياً يوضح أهمية فهم المقاصد.", en: "What's the difference between applying Shari'ah literally vs. understanding its objectives? Give a practical example showing the importance of understanding objectives." },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "sh_expr4", type: "open", path: "shariah",
+      question: { ar: "إذا سألك شخص عن حكم شرعي في مسألة لم تدرسها من قبل، ما هي الخطوات التي ستتبعها للوصول إلى الإجابة الصحيحة؟", en: "If someone asked you about a Shari'ah ruling on an issue you haven't studied before, what steps would you follow to reach the correct answer?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
   ],
 };
 
