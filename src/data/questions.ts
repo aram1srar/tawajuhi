@@ -92,6 +92,19 @@ export const questions: Record<string, Question[]> = {
     { id: "cs_processor1", type: "theory", path: "cs",
       question: { ar: "ما هو المعالج في الحاسوب؟", en: "What is the processor in a computer?" },
       options: [{ ar: "هو الجزء الذي يتيح نقل البيانات بين الأجهزة", en: "The part that transfers data between devices" }, { ar: "هو الجزء المسؤول عن تنفيذ التعليمات وحساب العمليات", en: "The part responsible for executing instructions and computing operations" }, { ar: "هو الجزء الذي يدير شبكة الإنترنت", en: "The part that manages the internet network" }, { ar: "هو الجزء المسؤول عن تخزين البيانات", en: "The part responsible for storing data" }], correctIndex: 1, explanation: { ar: "", en: "" } },
+    // NEW: Expressive open-ended questions for deeper analysis
+    { id: "cs_expr1", type: "open", path: "cs",
+      question: { ar: "تخيل أنك حصلت على فرصة لتطوير مشروع تقني يخدم مجتمعك المحلي. ما هو المشروع الذي ستختاره ولماذا؟ وكيف ستبدأ في تنفيذه؟", en: "Imagine you got an opportunity to develop a tech project serving your local community. What project would you choose, why, and how would you start implementing it?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "cs_expr2", type: "open", path: "cs",
+      question: { ar: "ما هو أكبر تحدٍّ تقني واجهته في حياتك (سواء في الدراسة أو خارجها)؟ كيف تعاملت معه وماذا تعلمت منه؟", en: "What's the biggest technical challenge you've faced (in school or outside)? How did you handle it and what did you learn?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "cs_expr3", type: "open", path: "cs",
+      question: { ar: "إذا كان بإمكانك اختراع تطبيق أو جهاز تقني جديد لم يُصنع من قبل، ماذا سيكون؟ اشرح فكرتك وكيف سيغير حياة الناس.", en: "If you could invent a new app or device that hasn't been made before, what would it be? Explain your idea and how it would change people's lives." },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
+    { id: "cs_expr4", type: "open", path: "cs",
+      question: { ar: "كيف ترى مستقبل التكنولوجيا في المملكة العربية السعودية خلال العشر سنوات القادمة؟ وما الدور الذي تطمح أن تلعبه في هذا المستقبل؟", en: "How do you see the future of technology in Saudi Arabia in the next 10 years? What role do you aspire to play?" },
+      options: [], correctIndex: -1, explanation: { ar: "", en: "" } },
   ],
   health: [
     // Original theory (8)
