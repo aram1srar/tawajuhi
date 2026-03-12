@@ -29,8 +29,8 @@ const ExamIntro: React.FC<{ onStart: () => void }> = ({ onStart }) => {
         </h1>
         <p className="text-muted-foreground mb-6 leading-relaxed">
           {locale === "ar"
-            ? "40 سؤال من جميع المسارات المهنية. أجب بصدق لنحدد المسار الأنسب لك."
-            : "40 questions across all career paths. Answer honestly so we can find the best path for you."}
+            ? "40 سؤال من جميع المسارات المهنية، منها أسئلة مقالية تعبيرية. أجب بصدق لنحدد المسار الأنسب لك."
+            : "40 questions across all career paths, including expressive essay questions. Answer honestly so we can find the best path for you."}
         </p>
 
         {/* Disclaimer note */}
@@ -73,15 +73,23 @@ const GeneralExamPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Build all 40 questions upfront: 38 MCQ (grouped by type) + 2 open-ended at the end
+  // Build all 40 questions upfront: 36 MCQ (grouped by type) + 4 open-ended at the end
   const examQuestions = useMemo(() => {
-    const mcq = getGeneralExamQuestions(38);
+    const mcq = getGeneralExamQuestions(36);
     const allOpen = getOpenEndedQuestions();
-    // Pick 2 random open-ended questions
-    const shuffledOpen = [...allOpen].sort(() => Math.random() - 0.5).slice(0, 2);
+    // Pick 4 random open-ended questions (1 from each path)
+    const paths = ["cs", "health", "business", "shariah"];
+    const selectedOpen: typeof allOpen = [];
+    paths.forEach(p => {
+      const pathOpen = allOpen.filter(q => q.path === p);
+      if (pathOpen.length > 0) {
+        const picked = pathOpen[Math.floor(Math.random() * pathOpen.length)];
+        selectedOpen.push(picked);
+      }
+    });
     // MCQ are already ordered: theory → interest → practical from getGeneralExamQuestions
     // Append open-ended at the end
-    return [...mcq, ...shuffledOpen];
+    return [...mcq, ...selectedOpen];
   }, []);
 
   const [started, setStarted] = useState(false);
