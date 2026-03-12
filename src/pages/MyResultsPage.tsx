@@ -97,6 +97,9 @@ const MyResultsPage: React.FC = () => {
             console.error("Strengths report error:", fnError);
           } else if (reportData?.error) {
             console.warn("AI analysis unavailable:", reportData.error);
+            if (reportData.error === "Payment required") {
+              toast.error(locale === "ar" ? "رصيد الذكاء الاصطناعي غير كافٍ. يمكنك مراجعة نتائجك بدون التحليل الذكي." : "AI credits depleted. You can still view your results without AI analysis.");
+            }
           } else if (reportData?.analysis) {
             setAiAnalysis(reportData.analysis);
           }
