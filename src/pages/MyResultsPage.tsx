@@ -90,10 +90,14 @@ const MyResultsPage: React.FC = () => {
       if (results.length > 0) {
         setAiLoading(true);
         try {
-          const { data: reportData } = await supabase.functions.invoke("analyze-strengths", {
+          const { data: reportData, error: fnError } = await supabase.functions.invoke("analyze-strengths", {
             body: { locale },
           });
-          if (reportData?.analysis) {
+          if (fnError) {
+            console.error("Strengths report error:", fnError);
+          } else if (reportData?.error) {
+            console.warn("AI analysis unavailable:", reportData.error);
+          } else if (reportData?.analysis) {
             setAiAnalysis(reportData.analysis);
           }
         } catch (err) {
